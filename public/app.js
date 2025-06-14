@@ -20,6 +20,152 @@ class SharanyaCollections {
         // Auth forms
         document.getElementById('signinForm').addEventListener('submit', (e) => this.handleSignin(e));
         document.getElementById('signupForm').addEventListener('submit', (e) => this.handleSignup(e));
+        
+        // Add real-time validation
+        this.setupFormValidation();
+    }
+
+    setupFormValidation() {
+        // Sign in form validation
+        const signinEmail = document.getElementById('signinEmail');
+        const signinPassword = document.getElementById('signinPassword');
+        
+        signinEmail.addEventListener('blur', () => this.validateField(signinEmail, 'signinEmailError', 'Email is required'));
+        signinPassword.addEventListener('blur', () => this.validateField(signinPassword, 'signinPasswordError', 'Password is required'));
+        
+        // Sign up form validation
+        const signupName = document.getElementById('signupName');
+        const signupEmail = document.getElementById('signupEmail');
+        const signupPassword = document.getElementById('signupPassword');
+        const roleSelect = document.getElementById('roleSelect');
+        const businessDetails = document.getElementById('businessDetails');
+        
+        signupName.addEventListener('blur', () => this.validateField(signupName, 'signupNameError', 'Name is required'));
+        signupEmail.addEventListener('blur', () => this.validateSignupEmail());
+        signupPassword.addEventListener('blur', () => this.validateSignupPassword());
+        roleSelect.addEventListener('change', () => this.validateRole());
+        businessDetails.addEventListener('blur', () => this.validateBusinessDetails());
+    }
+
+    validateField(field, errorId, message) {
+        const errorElement = document.getElementById(errorId);
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            errorElement.textContent = message;
+            return false;
+        } else {
+            field.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateSignupEmail() {
+        const email = document.getElementById('signupEmail');
+        const errorElement = document.getElementById('signupEmailError');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!email.value.trim()) {
+            email.classList.add('is-invalid');
+            errorElement.textContent = 'Email is required';
+            return false;
+        } else if (!emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            errorElement.textContent = 'Please enter a valid email address';
+            return false;
+        } else {
+            email.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateSignupPassword() {
+        const password = document.getElementById('signupPassword');
+        const errorElement = document.getElementById('signupPasswordError');
+        
+        if (!password.value.trim()) {
+            password.classList.add('is-invalid');
+            errorElement.textContent = 'Password is required';
+            return false;
+        } else if (password.value.length < 6) {
+            password.classList.add('is-invalid');
+            errorElement.textContent = 'Password must be at least 6 characters long';
+            return false;
+        } else {
+            password.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateRole() {
+        const role = document.getElementById('roleSelect');
+        const errorElement = document.getElementById('signupRoleError');
+        
+        if (!role.value) {
+            role.classList.add('is-invalid');
+            errorElement.textContent = 'Please select a role';
+            return false;
+        } else {
+            role.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateBusinessDetails() {
+        const role = document.getElementById('roleSelect');
+        const businessDetails = document.getElementById('businessDetails');
+        const errorElement = document.getElementById('businessDetailsError');
+        
+        if (role.value === 'vendor' && !businessDetails.value.trim()) {
+            businessDetails.classList.add('is-invalid');
+            errorElement.textContent = 'Business details are required for vendors';
+            return false;
+        } else {
+            businessDetails.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateSigninForm() {
+        const email = document.getElementById('signinEmail');
+        const password = document.getElementById('signinPassword');
+        
+        let isValid = true;
+        
+        if (!this.validateField(email, 'signinEmailError', 'Email is required')) {
+            isValid = false;
+        }
+        if (!this.validateField(password, 'signinPasswordError', 'Password is required')) {
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    validateSignupForm() {
+        let isValid = true;
+        
+        if (!this.validateField(document.getElementById('signupName'), 'signupNameError', 'Name is required')) {
+            isValid = false;
+        }
+        if (!this.validateSignupEmail()) {
+            isValid = false;
+        }
+        if (!this.validateSignupPassword()) {
+            isValid = false;
+        }
+        if (!this.validateRole()) {
+            isValid = false;
+        }
+        if (!this.validateBusinessDetails()) {
+            isValid = false;
+        }
+        
+        return isValid;
     }
 
     async checkAuth() {
@@ -46,6 +192,12 @@ class SharanyaCollections {
 
     async handleSignin(e) {
         e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateSigninForm()) {
+            return;
+        }
+        
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
 
@@ -75,6 +227,12 @@ class SharanyaCollections {
 
     async handleSignup(e) {
         e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateSignupForm()) {
+            return;
+        }
+        
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
 
@@ -667,11 +825,16 @@ function logout() {
 function toggleBusinessDetails() {
     const roleSelect = document.getElementById('roleSelect');
     const businessSection = document.getElementById('businessDetailsSection');
+    const businessDetails = document.getElementById('businessDetails');
     
     if (roleSelect.value === 'vendor') {
         businessSection.classList.remove('d-none');
+        businessDetails.setAttribute('required', 'required');
     } else {
         businessSection.classList.add('d-none');
+        businessDetails.removeAttribute('required');
+        businessDetails.classList.remove('is-invalid');
+        document.getElementById('businessDetailsError').textContent = '';
     }
 }
 
