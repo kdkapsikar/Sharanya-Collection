@@ -10,6 +10,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^22.13.11"
+    "@replit/database": "^3.0.1",
+    "@types/node": "^22.13.11",
+    "axios": "^1.10.0",
+    "bootstrap": "^5.3.6",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "leaflet": "^1.9.4",
+    "multer": "^2.0.1",
+    "node-cron": "^4.1.0",
+    "nodemailer": "^7.0.3",
+    "papaparse": "^5.5.3",
+    "razorpay": "^2.9.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0",
+    "react-scripts": "^5.0.1",
+    "twilio": "^5.7.1"
   }
 }
