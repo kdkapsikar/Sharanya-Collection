@@ -281,6 +281,24 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Initialize sample inventory if empty
+  try {
+    const existingInventory = await db.get('inventory');
+    if (!existingInventory || existingInventory.length === 0) {
+      const sampleInventory = [
+        { id: 'ITEM-001', name: 'Fresh Apples', category: 'Fruits', price: 120, stock: 50, countryOfOrigin: 'India' },
+        { id: 'ITEM-002', name: 'Organic Bananas', category: 'Fruits', price: 60, stock: 30, countryOfOrigin: 'India' },
+        { id: 'ITEM-003', name: 'Fresh Milk', category: 'Dairy', price: 45, stock: 25, countryOfOrigin: 'India' },
+        { id: 'ITEM-004', name: 'Whole Wheat Bread', category: 'Bakery', price: 35, stock: 20, countryOfOrigin: 'India' },
+        { id: 'ITEM-005', name: 'Basmati Rice', category: 'Grains', price: 80, stock: 40, countryOfOrigin: 'India' }
+      ];
+      await db.set('inventory', sampleInventory);
+      console.log('Sample inventory initialized');
+    }
+  } catch (error) {
+    console.error('Error initializing inventory:', error);
+  }
 });

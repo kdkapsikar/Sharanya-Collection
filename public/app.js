@@ -1,4 +1,3 @@
-
 const { useState, useEffect, useRef } = React;
 
 // Utility function to check delivery cutoff
@@ -20,10 +19,10 @@ const DeliveryTimer = () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(12, 0, 0, 0);
-      
+
       const cutoff = new Date();
       cutoff.setHours(12, 0, 0, 0);
-      
+
       let targetTime;
       if (now > cutoff) {
         targetTime = tomorrow;
@@ -32,9 +31,9 @@ const DeliveryTimer = () => {
         targetTime = cutoff;
         setIsPastCutoff(false);
       }
-      
+
       const diff = targetTime - now;
-      
+
       if (diff > 0) {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -71,7 +70,7 @@ const CSVUploader = ({ onUploadSuccess }) => {
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    
+
     if (selectedFile) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -85,17 +84,17 @@ const CSVUploader = ({ onUploadSuccess }) => {
 
   const handleUpload = async () => {
     if (!file) return;
-    
+
     setUploading(true);
     const formData = new FormData();
     formData.append('csvFile', file);
-    
+
     try {
       const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData
       });
-      
+
       const result = await response.json();
       if (result.success) {
         alert('Inventory uploaded successfully!');
@@ -103,7 +102,7 @@ const CSVUploader = ({ onUploadSuccess }) => {
         setFile(null);
         setPreview([]);
         fileInputRef.current.value = '';
-        
+
         // Play success sound
         const audio = new Audio('data:audio/wav;base64,UklGRvIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAAC');
         audio.play().catch(() => {}); // Ignore errors
@@ -145,7 +144,7 @@ const CSVUploader = ({ onUploadSuccess }) => {
           <p>Drag & drop CSV file here or click to select</p>
           <small className="text-muted">Required columns: name, price, category, stock</small>
         </div>
-        
+
         {preview.length > 0 && (
           <div className="mt-3">
             <h6>Preview (First 5 rows):</h6>
@@ -171,7 +170,7 @@ const CSVUploader = ({ onUploadSuccess }) => {
             </div>
           </div>
         )}
-        
+
         <button 
           className="btn btn-primary mt-3" 
           onClick={handleUpload}
@@ -398,9 +397,10 @@ const AdminPanel = () => {
     try {
       const response = await fetch('/api/inventory');
       const data = await response.json();
-      setInventory(data);
+      setInventory(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching inventory:', error);
+      setInventory([]);
     }
   };
 
@@ -520,9 +520,10 @@ const App = () => {
     try {
       const response = await fetch('/api/inventory');
       const data = await response.json();
-      setInventory(data);
+      setInventory(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching inventory:', error);
+      setInventory([]);
     }
   };
 
@@ -576,7 +577,7 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: total })
       });
-      
+
       const razorpayOrder = await orderResponse.json();
 
       const options = {
@@ -593,9 +594,9 @@ const App = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response)
           });
-          
+
           const verified = await verifyResponse.json();
-          
+
           if (verified.success) {
             // Create order
             const createOrderResponse = await fetch('/api/orders', {
@@ -612,9 +613,9 @@ const App = () => {
                 }
               })
             });
-            
+
             const orderResult = await createOrderResponse.json();
-            
+
             if (orderResult.success) {
               alert('Order placed successfully!');
               setCart([]);
@@ -668,7 +669,7 @@ const App = () => {
 
       <div className="container">
         <DeliveryTimer />
-        
+
         {currentView === 'shop' && (
           <div className="row">
             <div className="col-md-8">
