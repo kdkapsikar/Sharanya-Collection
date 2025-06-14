@@ -30,11 +30,14 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET || 'your_razorpay_secret'
 });
 
-// Initialize Twilio
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID || 'your_twilio_sid',
-  process.env.TWILIO_AUTH_TOKEN || 'your_twilio_token'
-);
+// Initialize Twilio only if valid credentials are provided
+let twilioClient = null;
+if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_ACCOUNT_SID.startsWith('AC')) {
+  twilioClient = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+  );
+}
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransporter({
@@ -129,12 +132,16 @@ app.post('/api/orders', async (req, res) => {
     }
     
     // Send WhatsApp notification
-    if (process.env.TWILIO_WHATSAPP_NUMBER) {
-      await twilioClient.messages.create({
-        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:${customerInfo.phone}`,
-        body: `Order ${orderId} placed successfully! Total: ₹${total.toFixed(2)}`
-      });
+    if (twilioClient && process.env.TWILIO_WHATSAPP_NUMBER) {
+      try {
+        await twilioClient.messages.create({
+          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+          to: `whatsapp:${customerInfo.phone}`,
+          body: `Order ${orderId} placed successfully! Total: ₹${total.toFixed(2)}`
+        });
+      } catch (error) {
+        console.log('WhatsApp notification failed:', error.message);
+      }
     }
     
     res.json({ success: true, order });
