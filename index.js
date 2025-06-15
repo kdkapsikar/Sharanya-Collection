@@ -439,6 +439,85 @@ app.post('/api/orders/:orderId/status', authenticateToken, (req, res) => {
   }
 });
 
+// Profile management routes
+app.put('/api/profile', authenticateToken, (req, res) => {
+  try {
+    const { name, email, businessDetails } = req.body;
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Check if email is already taken by another user
+    const existingUser = users.find(u => u.email === email && u.id !== req.user.id);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already in use by another account' });
+    }
+    
+    // Update user data
+    const user = users[userIndex];
+    user.name = name;
+    user.email = email;
+    
+    if (user.role === 'vendor') {
+      user.businessDetails = businessDetails;
+    }
+    
+    user.updatedAt = new Date().toISOString();
+    
+    saveData();
+    
+    res.json({ 
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        businessDetails: user.businessDetails,
+        isApproved: user.isApproved
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.put('/api/profile/password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const user = users[userIndex];
+    
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+    
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update password
+    user.password = hashedNewPassword;
+    user.updatedAt = new Date().toISOString();
+    
+    saveData();
+    
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Default route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

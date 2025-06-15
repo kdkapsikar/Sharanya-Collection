@@ -1250,7 +1250,7 @@ class SharanyaCollections {
 
     async showSection(sectionName) {
         // Hide all sections
-        const sections = ['homeSection', 'productsSection', 'authSection', 'dashboardSection'];
+        const sections = ['homeSection', 'productsSection', 'authSection', 'dashboardSection', 'profileSection'];
         sections.forEach(section => {
             document.getElementById(section).classList.add('d-none');
         });
@@ -1261,6 +1261,254 @@ class SharanyaCollections {
         // Reload products when navigating to products section
         if (sectionName === 'products') {
             await this.loadProducts();
+        }
+        
+        // Load profile when navigating to profile section
+        if (sectionName === 'profile') {
+            this.showProfile();
+        }
+    }
+
+    showProfile() {
+        if (!this.currentUser) return;
+
+        const profileContent = document.getElementById('profileContent');
+        profileContent.innerHTML = this.renderProfileView();
+    }
+
+    renderProfileView() {
+        return `
+            <div class="text-center mb-4">
+                <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
+                <h5>${this.currentUser.name}</h5>
+                <span class="badge bg-primary fs-6">${this.currentUser.role.charAt(0).toUpperCase() + this.currentUser.role.slice(1)} Portal</span>
+            </div>
+            
+            <div class="profile-details">
+                <div class="row mb-3">
+                    <div class="col-4"><strong>Name:</strong></div>
+                    <div class="col-8">${this.currentUser.name}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4"><strong>Email:</strong></div>
+                    <div class="col-8">${this.currentUser.email}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4"><strong>Role:</strong></div>
+                    <div class="col-8">
+                        <span class="badge bg-secondary">${this.currentUser.role.charAt(0).toUpperCase() + this.currentUser.role.slice(1)}</span>
+                    </div>
+                </div>
+                ${this.currentUser.role === 'vendor' && this.currentUser.businessDetails ? `
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Business Details:</strong></div>
+                        <div class="col-8">${this.currentUser.businessDetails}</div>
+                    </div>
+                ` : ''}
+                <div class="row mb-3">
+                    <div class="col-4"><strong>Status:</strong></div>
+                    <div class="col-8">
+                        <span class="badge ${this.currentUser.isApproved ? 'bg-success' : 'bg-warning'}">
+                            ${this.currentUser.isApproved ? 'Approved' : 'Pending Approval'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="app.editProfile()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button class="btn btn-outline-secondary ms-2" onclick="app.changePassword()">
+                    <i class="fas fa-key"></i> Change Password
+                </button>
+            </div>
+        `;
+    }
+
+    editProfile() {
+        const profileContent = document.getElementById('profileContent');
+        profileContent.innerHTML = this.renderProfileEditForm();
+    }
+
+    renderProfileEditForm() {
+        return `
+            <form id="editProfileForm" onsubmit="app.updateProfile(event)">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
+                    <h5>Edit Profile</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" id="editName" value="${this.currentUser.name}" required>
+                    <div class="invalid-feedback" id="editNameError"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" id="editEmail" value="${this.currentUser.email}" required>
+                    <div class="invalid-feedback" id="editEmailError"></div>
+                </div>
+                
+                ${this.currentUser.role === 'vendor' ? `
+                    <div class="mb-3">
+                        <label class="form-label">Business Details</label>
+                        <textarea class="form-control" name="businessDetails" id="editBusinessDetails" rows="3" placeholder="Describe your business, shop location, products you deal with, etc.">${this.currentUser.businessDetails || ''}</textarea>
+                        <div class="invalid-feedback" id="editBusinessDetailsError"></div>
+                    </div>
+                ` : ''}
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary flex-fill" onclick="app.showProfile()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        `;
+    }
+
+    changePassword() {
+        const profileContent = document.getElementById('profileContent');
+        profileContent.innerHTML = this.renderPasswordChangeForm();
+    }
+
+    renderPasswordChangeForm() {
+        return `
+            <form id="changePasswordForm" onsubmit="app.updatePassword(event)">
+                <div class="text-center mb-4">
+                    <i class="fas fa-key fa-3x text-muted mb-3"></i>
+                    <h5>Change Password</h5>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Current Password <span class="text-danger">*</span></label>
+                    <div class="password-field">
+                        <input type="password" class="form-control" name="currentPassword" id="currentPassword" required>
+                        <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('currentPassword', this)"></i>
+                    </div>
+                    <div class="invalid-feedback" id="currentPasswordError"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">New Password <span class="text-danger">*</span></label>
+                    <div class="password-field">
+                        <input type="password" class="form-control" name="newPassword" id="newPassword" minlength="6" required>
+                        <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('newPassword', this)"></i>
+                    </div>
+                    <div class="invalid-feedback" id="newPasswordError"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+                    <div class="password-field">
+                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" minlength="6" required>
+                        <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('confirmPassword', this)"></i>
+                    </div>
+                    <div class="invalid-feedback" id="confirmPasswordError"></div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                    <button type="button" class="btn btn-secondary flex-fill" onclick="app.showProfile()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        `;
+    }
+
+    async updateProfile(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        // Basic validation
+        if (!data.name.trim()) {
+            this.showAlert('Name is required', 'danger');
+            return;
+        }
+        
+        if (!data.email.trim()) {
+            this.showAlert('Email is required', 'danger');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/profile', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}` 
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                // Update current user data
+                this.currentUser = { ...this.currentUser, ...result.user };
+                
+                // Update UI
+                document.getElementById('userName').textContent = this.currentUser.name;
+                
+                this.showAlert('Profile updated successfully!', 'success');
+                this.showProfile(); // Go back to profile view
+            } else {
+                this.showAlert(result.error, 'danger');
+            }
+        } catch (error) {
+            this.showAlert('Failed to update profile', 'danger');
+        }
+    }
+
+    async updatePassword(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        // Validation
+        if (data.newPassword !== data.confirmPassword) {
+            this.showAlert('New passwords do not match', 'danger');
+            return;
+        }
+        
+        if (data.newPassword.length < 6) {
+            this.showAlert('Password must be at least 6 characters long', 'danger');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/profile/password', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}` 
+                },
+                body: JSON.stringify({
+                    currentPassword: data.currentPassword,
+                    newPassword: data.newPassword
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                this.showAlert('Password updated successfully!', 'success');
+                this.showProfile(); // Go back to profile view
+            } else {
+                this.showAlert(result.error, 'danger');
+            }
+        } catch (error) {
+            this.showAlert('Failed to update password', 'danger');
         }
     }
 
