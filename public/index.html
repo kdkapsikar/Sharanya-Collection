@@ -110,38 +110,41 @@
             }
         }
         
-        /* Fix navbar toggler */
-        .navbar-toggler {
-            border: none;
-            padding: 0.25rem 0.5rem;
+        /* Horizontal navbar styling */
+        .navbar .nav-link {
+            white-space: nowrap;
         }
-        .navbar-toggler:focus {
-            box-shadow: none;
+        
+        @media (max-width: 767.98px) {
+            .navbar .nav-link {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .navbar-brand {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#"><i class="fas fa-store"></i> Sharanya Collections</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item d-none" id="homeLink">
+            <div class="d-flex align-items-center">
+                <ul class="navbar-nav d-flex flex-row me-3">
+                    <li class="nav-item d-none me-3" id="homeLink">
                         <a class="nav-link" href="#" onclick="showSection('home')">Home</a>
                     </li>
-                    <li class="nav-item d-none" id="dashboardLink">
+                    <li class="nav-item d-none me-3" id="dashboardLink">
                         <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
                     </li>
-                    <li class="nav-item d-none" id="productsLink">
+                    <li class="nav-item d-none me-3" id="productsLink">
                         <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
                     </li>
-                    </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item d-none" id="userInfo">
+                </ul>
+                <ul class="navbar-nav d-flex flex-row">
+                    <li class="nav-item d-none me-3" id="userInfo">
                         <span class="nav-link">
                             <span id="userName"></span>
                             <span class="badge bg-info ms-2" id="userRole"></span>
