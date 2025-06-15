@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "e98b37c7-18b7-46da-ab27-5186f7eb04f9",
+      "name": "Admin",
+      "email": "admin@sharanyacollections.com",
+      "password": "$2a$12$2wqsGKI42Ei9uhDXFJ71AeT4rNmgdvm35TnlcppnARIaHmVgZhJmC",
+      "role": "admin",
+      "isApproved": true,
+      "createdAt": "2025-06-15T05:51:59.631Z"
+    },
+    {
+      "id": "c71c4aa2-f90a-4517-85c8-e9bbb7368411",
+      "name": "Ketan Kapsikar",
+      "email": "kd.kapsikar@gmail.com",
+      "password": "$2a$12$1Ixm8FhTSywUB0zlHIqE0em20aDFqUzPMWoyyQyqwS/lUJtmVQVVy",
+      "role": "customer",
+      "businessDetails": null,
+      "isApproved": true,
+      "createdAt": "2025-06-15T05:52:26.316Z"
+    },
+    {
+      "id": "fd258163-42cc-420c-b587-0f13acdad3b4",
+      "name": "Ketan Kapsikar",
+      "email": "ketan.kapsikar@gmail.com",
+      "password": "$2a$12$c/tjBqZR4REHJNkBDsNxAe30WnC/qY24egXvLNr3Iv7U4cGcnalUa",
+      "role": "vendor",
+      "businessDetails": "Clothing & Jewelries ",
+      "isApproved": true,
+      "createdAt": "2025-06-15T05:53:11.962Z"
+    }
+  ],
+  "products": [],
+  "orders": [],
+  "deliveryPersonnel": []
+}

@@ -15,10 +15,16 @@
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 100px 0;
+            padding: 60px 0;
+        }
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 100px 0;
+            }
         }
         .card {
             transition: transform 0.2s;
+            margin-bottom: 1rem;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -26,6 +32,7 @@
         .product-image {
             height: 200px;
             object-fit: cover;
+            width: 100%;
         }
         .role-badge {
             position: absolute;
@@ -37,6 +44,7 @@
             border: 2px solid #e91e63;
             border-radius: 15px;
             color: #333 !important;
+            height: 100%;
         }
         .portal-card h5 {
             color: #333 !important;
@@ -67,48 +75,90 @@
         }
         .password-toggle {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
             color: #6c757d;
             z-index: 10;
+            padding: 5px;
         }
         .password-toggle:hover {
             color: #495057;
+        }
+        
+        /* Mobile specific styles */
+        @media (max-width: 767.98px) {
+            .hero-section .display-4 {
+                font-size: 2rem;
+            }
+            .hero-section .lead {
+                font-size: 1rem;
+            }
+            .navbar-nav .nav-link {
+                padding: 0.5rem 1rem;
+            }
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .card {
+                margin-bottom: 1rem;
+            }
+            .portal-card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Horizontal navbar styling */
+        .navbar .nav-link {
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 767.98px) {
+            .navbar .nav-link {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .navbar-brand {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#"><i class="fas fa-store"></i> Sharanya Collections</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+            <div class="d-flex align-items-center">
+                <ul class="navbar-nav d-flex flex-row me-3">
+                    <li class="nav-item d-none me-3" id="homeLink">
                         <a class="nav-link" href="#" onclick="showSection('home')">Home</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-none me-3" id="dashboardLink">
+                        <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
+                    </li>
+                    <li class="nav-item d-none me-3" id="productsLink">
                         <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
                     </li>
-                    <li class="nav-item" id="authLinks">
-                        <a class="nav-link" href="#" onclick="showSection('auth')">Sign In / Sign Up</a>
+                </ul>
+                <ul class="navbar-nav d-flex flex-row">
+                    <li class="nav-item d-none me-3" id="userInfo">
+                        <span class="nav-link">
+                            <span id="userName"></span>
+                            <span class="badge bg-info ms-2" id="userRole"></span>
+                        </span>
                     </li>
-                    <li class="nav-item d-none" id="userMenu">
-                        <div class="dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <span id="userName"></span>
-                                <span class="badge bg-info ms-2" id="userRole"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="showDashboard()">Dashboard</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
-                            </ul>
-                        </div>
+                    <li class="nav-item" id="authLinks">
+                        <a class="nav-link" href="#" onclick="showSection('auth')" title="Sign In / Sign Up">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none" id="logoutLink">
+                        <a class="nav-link" href="#" onclick="logout()" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -129,32 +179,32 @@
                     <h1 class="display-4 mb-4">Welcome to Sharanya Collections</h1>
                     <p class="lead mb-4">Your trusted multi-vendor e-commerce platform connecting local businesses with customers</p>
                     <div class="row justify-content-center">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-3">
                             <div class="card portal-card text-center p-3">
-                                <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                                <h5>Customers</h5>
-                                <p>Browse and order from local vendors</p>
+                                <i class="fas fa-users fa-2x fa-md-3x text-primary mb-3"></i>
+                                <h6 class="h6 h-md-5">Customers</h6>
+                                <p class="small">Browse and order from local vendors</p>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-3">
                             <div class="card portal-card text-center p-3">
-                                <i class="fas fa-store fa-3x text-success mb-3"></i>
-                                <h5>Vendors</h5>
-                                <p>List your products and grow your business</p>
+                                <i class="fas fa-store fa-2x fa-md-3x text-success mb-3"></i>
+                                <h6 class="h6 h-md-5">Vendors</h6>
+                                <p class="small">List your products and grow your business</p>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-3">
                             <div class="card portal-card text-center p-3">
-                                <i class="fas fa-truck fa-3x text-warning mb-3"></i>
-                                <h5>Delivery Partners</h5>
-                                <p>Join our delivery network</p>
+                                <i class="fas fa-truck fa-2x fa-md-3x text-warning mb-3"></i>
+                                <h6 class="h6 h-md-5">Delivery Partners</h6>
+                                <p class="small">Join our delivery network</p>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-3">
                             <div class="card portal-card text-center p-3">
-                                <i class="fas fa-cog fa-3x text-info mb-3"></i>
-                                <h5>Admin</h5>
-                                <p>Manage the entire platform</p>
+                                <i class="fas fa-cog fa-2x fa-md-3x text-info mb-3"></i>
+                                <h6 class="h6 h-md-5">Admin</h6>
+                                <p class="small">Manage the entire platform</p>
                             </div>
                         </div>
                     </div>
@@ -176,7 +226,7 @@
         <section id="authSection" class="d-none">
             <div class="container py-5">
                 <div class="row justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-8 col-lg-6">
                         <div class="card">
                             <div class="card-header">
                                 <ul class="nav nav-tabs card-header-tabs" role="tablist">

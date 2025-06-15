@@ -32,11 +32,43 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// In-memory database (replace with actual database in production)
-let users = [];
-let products = [];
-let orders = [];
-let deliveryPersonnel = [];
+// JSON file-based storage
+const DATA_FILE = 'data.json';
+
+// Load data from file or initialize empty
+function loadData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      return {
+        users: data.users || [],
+        products: data.products || [],
+        orders: data.orders || [],
+        deliveryPersonnel: data.deliveryPersonnel || []
+      };
+    }
+  } catch (error) {
+    console.error('Error loading data:', error);
+  }
+  return { users: [], products: [], orders: [], deliveryPersonnel: [] };
+}
+
+// Save data to file
+function saveData() {
+  try {
+    const data = { users, products, orders, deliveryPersonnel };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
+}
+
+// Load initial data
+const data = loadData();
+let users = data.users;
+let products = data.products;
+let orders = data.orders;
+let deliveryPersonnel = data.deliveryPersonnel;
 
 // Helper function to generate JWT token
 const generateToken = (user) => {
@@ -102,6 +134,7 @@ app.post('/api/auth/signup', async (req, res) => {
     };
 
     users.push(user);
+    saveData();
 
     // Generate token
     const token = generateToken(user);
@@ -191,6 +224,7 @@ app.post('/api/products', authenticateToken, requireRole(['vendor']), upload.sin
     };
 
     products.push(product);
+    saveData();
     res.status(201).json({ message: 'Product added successfully', product });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -239,6 +273,7 @@ app.post('/api/orders', authenticateToken, requireRole(['customer']), (req, res)
     };
 
     orders.push(order);
+    saveData();
     res.status(201).json({ message: 'Order placed successfully', order });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -298,6 +333,7 @@ app.post('/api/admin/approve-user', authenticateToken, requireRole(['admin']), (
     }
     
     user.isApproved = true;
+    saveData();
     res.json({ message: 'User approved successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -315,6 +351,7 @@ app.post('/api/admin/assign-delivery', authenticateToken, requireRole(['admin'])
     
     order.assignedDeliveryPerson = deliveryPersonId;
     order.status = 'assigned';
+    saveData();
     
     res.json({ message: 'Delivery person assigned successfully' });
   } catch (error) {
@@ -339,6 +376,7 @@ app.post('/api/orders/:orderId/status', authenticateToken, (req, res) => {
     }
     
     order.status = status;
+    saveData();
     res.json({ message: 'Order status updated successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -364,6 +402,7 @@ const createDefaultAdmin = async () => {
       isApproved: true,
       createdAt: new Date().toISOString()
     });
+    saveData();
     console.log('Default admin created: admin@sharanyacollections.com / admin123');
   }
 };
