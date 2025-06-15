@@ -330,7 +330,7 @@ class SharanyaCollections {
                     <div class="card h-100">
                         ${(product.images && product.images.length > 0) || product.image ? `
                             <div style="height: 250px; overflow: hidden; position: relative; background: #f8f9fa;">
-                                ${product.images && product.images.length > 1 ? `
+                                ${product.images && product.images.length > 0 ? `
                                     <div id="carousel-${product.id}" class="carousel slide h-100" data-bs-ride="carousel">
                                         <div class="carousel-inner h-100">
                                             ${product.images.map((img, index) => `
@@ -357,7 +357,7 @@ class SharanyaCollections {
                                     </div>
                                 ` : `
                                     <div class="d-flex align-items-center justify-content-center h-100">
-                                        <img src="${product.images ? product.images[0] : product.image}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
+                                        <img src="${product.image}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
                                     </div>
                                 `}
                             </div>
