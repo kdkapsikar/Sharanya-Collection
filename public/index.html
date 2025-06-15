@@ -88,19 +88,21 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showSection('home')">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
                     </li>
                     <li class="nav-item d-none" id="dashboardLink">
                         <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
+                    </li>
                     <li class="nav-item" id="authLinks">
                         <a class="nav-link" href="#" onclick="showSection('auth')">Sign In / Sign Up</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item d-none" id="userInfo">
                         <span class="nav-link">
                             <span id="userName"></span>
