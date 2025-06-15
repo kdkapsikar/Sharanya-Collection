@@ -321,11 +321,8 @@ class SharanyaCollections {
         const productsList = document.getElementById('productsList');
         productsList.innerHTML = '';
 
-        // Filter products based on user role
+        // Show all products in the Products section
         let productsToShow = this.products;
-        if (this.currentUser && this.currentUser.role === 'vendor') {
-            productsToShow = this.products.filter(product => product.vendorId === this.currentUser.id);
-        }
 
         productsToShow.forEach(product => {
             const productCard = `
