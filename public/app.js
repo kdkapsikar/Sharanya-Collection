@@ -274,14 +274,18 @@ class SharanyaCollections {
 
     updateUI() {
         const authLinks = document.getElementById('authLinks');
+        const homeLink = document.getElementById('homeLink');
         const dashboardLink = document.getElementById('dashboardLink');
+        const productsLink = document.getElementById('productsLink');
         const userInfo = document.getElementById('userInfo');
         const logoutLink = document.getElementById('logoutLink');
         const roleBadge = document.getElementById('roleBadge');
 
         if (this.currentUser) {
             authLinks.classList.add('d-none');
+            homeLink.classList.remove('d-none');
             dashboardLink.classList.remove('d-none');
+            productsLink.classList.remove('d-none');
             userInfo.classList.remove('d-none');
             logoutLink.classList.remove('d-none');
             roleBadge.classList.remove('d-none');
@@ -291,7 +295,9 @@ class SharanyaCollections {
             roleBadge.querySelector('.badge').textContent = this.currentUser.role.toUpperCase();
         } else {
             authLinks.classList.remove('d-none');
+            homeLink.classList.add('d-none');
             dashboardLink.classList.add('d-none');
+            productsLink.classList.add('d-none');
             userInfo.classList.add('d-none');
             logoutLink.classList.add('d-none');
             roleBadge.classList.add('d-none');
