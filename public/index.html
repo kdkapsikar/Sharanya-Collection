@@ -62,6 +62,21 @@
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
+        .password-field {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+        .password-toggle:hover {
+            color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -185,7 +200,10 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Password <span class="text-danger">*</span></label>
-                                                <input type="password" class="form-control" name="password" id="signinPassword" required>
+                                                <div class="password-field">
+                                                    <input type="password" class="form-control" name="password" id="signinPassword" required>
+                                                    <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('signinPassword', this)"></i>
+                                                </div>
                                                 <div class="invalid-feedback" id="signinPasswordError"></div>
                                             </div>
                                             <button type="submit" class="btn btn-primary w-100">Sign In</button>
@@ -207,7 +225,10 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Password <span class="text-danger">*</span></label>
-                                                <input type="password" class="form-control" name="password" id="signupPassword" required minlength="6">
+                                                <div class="password-field">
+                                                    <input type="password" class="form-control" name="password" id="signupPassword" required minlength="6">
+                                                    <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('signupPassword', this)"></i>
+                                                </div>
                                                 <div class="invalid-feedback" id="signupPasswordError"></div>
                                             </div>
                                             <div class="mb-3">

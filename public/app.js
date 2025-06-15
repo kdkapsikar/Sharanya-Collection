@@ -838,5 +838,14 @@ function toggleBusinessDetails() {
     }
 }
 
+// Password visibility toggle function
+function togglePasswordVisibility(passwordFieldId, eyeIcon) {
+    const passwordField = document.getElementById(passwordFieldId);
+    const isPassword = passwordField.type === 'password';
+    
+    passwordField.type = isPassword ? 'text' : 'password';
+    eyeIcon.className = isPassword ? 'fas fa-eye-slash password-toggle' : 'fas fa-eye password-toggle';
+}
+
 // Initialize app
 const app = new SharanyaCollections();
