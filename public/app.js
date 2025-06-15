@@ -965,16 +965,19 @@ class SharanyaCollections {
         formBody.innerHTML = this.renderAddProductForm(true, product);
     }
 
-    editProductInline(productId) {
+    async editProductInline(productId) {
         // Navigate to dashboard to edit the product
-        this.showDashboard().then(() => {
+        await this.showDashboard();
+        
+        // Wait a bit for the dashboard to render completely
+        setTimeout(() => {
             // Find the product in the loaded vendor products
             const product = this.vendorProducts.find(p => p.id === productId);
             if (product) {
                 // Trigger the edit mode in dashboard
                 this.editProduct(productId);
             }
-        });
+        }, 100);
     }
 
     cancelEdit() {
