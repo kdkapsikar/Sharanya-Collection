@@ -21,13 +21,15 @@
     },
     {
       "id": "fd258163-42cc-420c-b587-0f13acdad3b4",
-      "name": "Ketan Kapsikar",
+      "name": "undefined",
       "email": "ketan.kapsikar@gmail.com",
       "password": "$2a$12$c/tjBqZR4REHJNkBDsNxAe30WnC/qY24egXvLNr3Iv7U4cGcnalUa",
       "role": "vendor",
-      "businessDetails": "Clothing & Jewelries ",
+      "businessDetails": "",
       "isApproved": true,
-      "createdAt": "2025-06-15T05:53:11.962Z"
+      "createdAt": "2025-06-15T05:53:11.962Z",
+      "mobile": "9999999998",
+      "updatedAt": "2025-06-15T15:26:50.996Z"
     },
     {
       "id": "6d046cb4-b267-46e0-a9c2-bcd7695f3c73",
@@ -51,15 +53,15 @@
     },
     {
       "id": "bf6eda94-4572-41fb-b025-95fae571bae0",
-      "name": "Custom",
+      "name": "Customer",
       "email": "Customer@sharanyacollection.com",
       "password": "$2a$12$8Wwygu2F.GWB0a63XTZ61O27bOYePAPtn.UY0XOstbJlhQOqIAHjK",
       "role": "customer",
       "businessDetails": null,
       "isApproved": true,
       "createdAt": "2025-06-15T14:36:46.102Z",
-      "mobile": "9999999999",
-      "updatedAt": "2025-06-15T15:24:54.248Z"
+      "mobile": "9999999997",
+      "updatedAt": "2025-06-15T15:30:50.958Z"
     }
   ],
   "products": [
