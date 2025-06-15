@@ -104,12 +104,22 @@ const requireRole = (roles) => {
 // Auth Routes
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { name, email, password, role, businessDetails } = req.body;
+    const { name, email, mobile, password, role, businessDetails } = req.body;
     
-    // Check if user already exists
-    const existingUser = users.find(u => u.email === email);
+    // Check if user already exists (by email or mobile)
+    const existingUser = users.find(u => u.email === email || u.mobile === mobile);
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      if (existingUser.email === email) {
+        return res.status(400).json({ error: 'Email already exists' });
+      } else {
+        return res.status(400).json({ error: 'Mobile number already exists' });
+      }
+    }
+
+    // Validate mobile number
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobile || !mobileRegex.test(mobile)) {
+      return res.status(400).json({ error: 'Please provide a valid 10-digit mobile number' });
     }
 
     // Validate role
@@ -126,6 +136,7 @@ app.post('/api/auth/signup', async (req, res) => {
       id: uuidv4(),
       name,
       email,
+      mobile,
       password: hashedPassword,
       role,
       businessDetails: role === 'vendor' ? businessDetails : null,
@@ -146,6 +157,7 @@ app.post('/api/auth/signup', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         isApproved: user.isApproved
       }
@@ -196,6 +208,7 @@ app.post('/api/auth/signin', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         isApproved: user.isApproved
       }
@@ -368,6 +381,7 @@ app.get('/api/admin/users', authenticateToken, requireRole(['admin']), (req, res
       id: u.id,
       name: u.name,
       email: u.email,
+      mobile: u.mobile,
       role: u.role,
       isApproved: u.isApproved,
       businessDetails: u.businessDetails,
@@ -442,7 +456,7 @@ app.post('/api/orders/:orderId/status', authenticateToken, (req, res) => {
 // Profile management routes
 app.put('/api/profile', authenticateToken, (req, res) => {
   try {
-    const { name, email, businessDetails } = req.body;
+    const { name, email, mobile, businessDetails } = req.body;
     
     // Find user
     const userIndex = users.findIndex(u => u.id === req.user.id);
@@ -450,16 +464,27 @@ app.put('/api/profile', authenticateToken, (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Check if email is already taken by another user
-    const existingUser = users.find(u => u.email === email && u.id !== req.user.id);
+    // Validate mobile number
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobile || !mobileRegex.test(mobile)) {
+      return res.status(400).json({ error: 'Please provide a valid 10-digit mobile number' });
+    }
+
+    // Check if email or mobile is already taken by another user
+    const existingUser = users.find(u => (u.email === email || u.mobile === mobile) && u.id !== req.user.id);
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already in use by another account' });
+      if (existingUser.email === email) {
+        return res.status(400).json({ error: 'Email already in use by another account' });
+      } else {
+        return res.status(400).json({ error: 'Mobile number already in use by another account' });
+      }
     }
     
     // Update user data
     const user = users[userIndex];
     user.name = name;
     user.email = email;
+    user.mobile = mobile;
     
     if (user.role === 'vendor') {
       user.businessDetails = businessDetails;
@@ -475,6 +500,7 @@ app.put('/api/profile', authenticateToken, (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         businessDetails: user.businessDetails,
         isApproved: user.isApproved

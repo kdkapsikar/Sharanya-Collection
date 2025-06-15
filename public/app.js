@@ -36,12 +36,14 @@ class SharanyaCollections {
         // Sign up form validation
         const signupName = document.getElementById('signupName');
         const signupEmail = document.getElementById('signupEmail');
+        const signupMobile = document.getElementById('signupMobile');
         const signupPassword = document.getElementById('signupPassword');
         const roleSelect = document.getElementById('roleSelect');
         const businessDetails = document.getElementById('businessDetails');
         
         signupName.addEventListener('blur', () => this.validateField(signupName, 'signupNameError', 'Name is required'));
         signupEmail.addEventListener('blur', () => this.validateSignupEmail());
+        signupMobile.addEventListener('blur', () => this.validateSignupMobile());
         signupPassword.addEventListener('blur', () => this.validateSignupPassword());
         roleSelect.addEventListener('change', () => this.validateRole());
         businessDetails.addEventListener('blur', () => this.validateBusinessDetails());
@@ -75,6 +77,26 @@ class SharanyaCollections {
             return false;
         } else {
             email.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateSignupMobile() {
+        const mobile = document.getElementById('signupMobile');
+        const errorElement = document.getElementById('signupMobileError');
+        const mobileRegex = /^[6-9]\d{9}$/;
+        
+        if (!mobile.value.trim()) {
+            mobile.classList.add('is-invalid');
+            errorElement.textContent = 'Mobile number is required';
+            return false;
+        } else if (!mobileRegex.test(mobile.value)) {
+            mobile.classList.add('is-invalid');
+            errorElement.textContent = 'Please enter a valid 10-digit mobile number';
+            return false;
+        } else {
+            mobile.classList.remove('is-invalid');
             errorElement.textContent = '';
             return true;
         }
@@ -153,6 +175,9 @@ class SharanyaCollections {
             isValid = false;
         }
         if (!this.validateSignupEmail()) {
+            isValid = false;
+        }
+        if (!this.validateSignupMobile()) {
             isValid = false;
         }
         if (!this.validateSignupPassword()) {
@@ -1294,6 +1319,10 @@ class SharanyaCollections {
                     <div class="col-8">${this.currentUser.email}</div>
                 </div>
                 <div class="row mb-3">
+                    <div class="col-4"><strong>Mobile:</strong></div>
+                    <div class="col-8">${this.currentUser.mobile || 'Not provided'}</div>
+                </div>
+                <div class="row mb-3">
                     <div class="col-4"><strong>Role:</strong></div>
                     <div class="col-8">
                         <span class="badge bg-secondary">${this.currentUser.role.charAt(0).toUpperCase() + this.currentUser.role.slice(1)}</span>
@@ -1349,6 +1378,11 @@ class SharanyaCollections {
                     <label class="form-label">Email <span class="text-danger">*</span></label>
                     <input type="email" class="form-control" name="email" id="editEmail" value="${this.currentUser.email}" required>
                     <div class="invalid-feedback" id="editEmailError"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" name="mobile" id="editMobile" value="${this.currentUser.mobile || ''}" placeholder="Enter 10-digit mobile number" required>
+                    <div class="invalid-feedback" id="editMobileError"></div>
                 </div>
                 
                 ${this.currentUser.role === 'vendor' ? `
@@ -1437,6 +1471,18 @@ class SharanyaCollections {
         
         if (!data.email.trim()) {
             this.showAlert('Email is required', 'danger');
+            return;
+        }
+        
+        // Validate mobile number
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!data.mobile.trim()) {
+            this.showAlert('Mobile number is required', 'danger');
+            return;
+        }
+        
+        if (!mobileRegex.test(data.mobile)) {
+            this.showAlert('Please enter a valid 10-digit mobile number', 'danger');
             return;
         }
 
