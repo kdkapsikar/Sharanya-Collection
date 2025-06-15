@@ -256,6 +256,47 @@ app.get('/api/vendor/products', authenticateToken, requireRole(['vendor']), (req
   }
 });
 
+app.put('/api/products/:productId', authenticateToken, requireRole(['vendor']), upload.single('image'), (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { name, description, price, category, stock, countryOfOrigin } = req.body;
+    
+    // Find the product
+    const productIndex = products.findIndex(p => p.id === productId && p.vendorId === req.user.id);
+    if (productIndex === -1) {
+      return res.status(404).json({ error: 'Product not found or access denied' });
+    }
+    
+    // Update product details
+    const product = products[productIndex];
+    product.name = name;
+    product.description = description;
+    product.price = parseFloat(price);
+    product.category = category;
+    product.stock = parseInt(stock);
+    product.countryOfOrigin = countryOfOrigin;
+    
+    // Update image if new one provided
+    if (req.file) {
+      // Remove old image file if it exists
+      if (product.image) {
+        const oldImagePath = path.join(__dirname, 'public', product.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      product.image = `/uploads/${req.file.filename}`;
+    }
+    
+    product.updatedAt = new Date().toISOString();
+    
+    saveData();
+    res.json({ message: 'Product updated successfully', product });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Order Routes
 app.post('/api/orders', authenticateToken, requireRole(['customer']), (req, res) => {
   try {

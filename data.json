@@ -28,6 +28,26 @@
       "businessDetails": "Clothing & Jewelries ",
       "isApproved": true,
       "createdAt": "2025-06-15T05:53:11.962Z"
+    },
+    {
+      "id": "6d046cb4-b267-46e0-a9c2-bcd7695f3c73",
+      "name": "Vendor",
+      "email": "vendor@sharanyacollections.com",
+      "password": "$2a$12$kir9rKyfSt4sK.uoRA2iC.9DifJnCCZzCdAsd2zJ5kec3nHgWf3dG",
+      "role": "vendor",
+      "businessDetails": "Clothing and jewellries",
+      "isApproved": true,
+      "createdAt": "2025-06-15T07:19:57.609Z"
+    },
+    {
+      "id": "77ed032d-b5c5-4279-8da9-20ac7a9e4e77",
+      "name": "Delivery Partner",
+      "email": "delivery.partner@sharanyacollections.com",
+      "password": "$2a$12$cXguuq/WFmBxaAekGvjSquPGL/aRAaNzEo6GBReSFUArvJbJmwuwa",
+      "role": "delivery",
+      "businessDetails": null,
+      "isApproved": true,
+      "createdAt": "2025-06-15T07:20:34.482Z"
     }
   ],
   "products": [
