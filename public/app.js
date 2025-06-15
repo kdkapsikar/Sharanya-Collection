@@ -351,6 +351,10 @@ class SharanyaCollections {
                             </div>
                             ${this.currentUser && this.currentUser.role === 'customer' ? 
                                 `<button class="btn btn-primary w-100" onclick="app.addToCart('${product.id}')">Add to Cart</button>` : ''}
+                            ${this.currentUser && this.currentUser.role === 'vendor' && product.vendorId === this.currentUser.id ? 
+                                `<button class="btn btn-outline-primary w-100" onclick="app.editProductInline('${product.id}')">
+                                    <i class="fas fa-edit"></i> Edit Product
+                                </button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -959,6 +963,18 @@ class SharanyaCollections {
         
         formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Product';
         formBody.innerHTML = this.renderAddProductForm(true, product);
+    }
+
+    editProductInline(productId) {
+        // Navigate to dashboard to edit the product
+        this.showDashboard().then(() => {
+            // Find the product in the loaded vendor products
+            const product = this.vendorProducts.find(p => p.id === productId);
+            if (product) {
+                // Trigger the edit mode in dashboard
+                this.editProduct(productId);
+            }
+        });
     }
 
     cancelEdit() {
