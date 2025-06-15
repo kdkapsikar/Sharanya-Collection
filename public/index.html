@@ -36,6 +36,13 @@
         .portal-card {
             border: 2px solid #e91e63;
             border-radius: 15px;
+            color: #333 !important;
+        }
+        .portal-card h5 {
+            color: #333 !important;
+        }
+        .portal-card p {
+            color: #666 !important;
         }
         .btn-primary {
             background-color: #e91e63;
@@ -44,6 +51,31 @@
         .btn-primary:hover {
             background-color: #c2185b;
             border-color: #c2185b;
+        }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .password-field {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+        .password-toggle:hover {
+            color: #495057;
         }
     </style>
 </head>
@@ -160,14 +192,19 @@
                                 <div class="tab-content">
                                     <!-- Sign In Tab -->
                                     <div class="tab-pane fade show active" id="signin">
-                                        <form id="signinForm">
+                                        <form id="signinForm" novalidate>
                                             <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" name="email" required>
+                                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                <input type="email" class="form-control" name="email" id="signinEmail" required>
+                                                <div class="invalid-feedback" id="signinEmailError"></div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Password</label>
-                                                <input type="password" class="form-control" name="password" required>
+                                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                                <div class="password-field">
+                                                    <input type="password" class="form-control" name="password" id="signinPassword" required>
+                                                    <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('signinPassword', this)"></i>
+                                                </div>
+                                                <div class="invalid-feedback" id="signinPasswordError"></div>
                                             </div>
                                             <button type="submit" class="btn btn-primary w-100">Sign In</button>
                                         </form>
@@ -175,31 +212,39 @@
                                     
                                     <!-- Sign Up Tab -->
                                     <div class="tab-pane fade" id="signup">
-                                        <form id="signupForm">
+                                        <form id="signupForm" novalidate>
                                             <div class="mb-3">
-                                                <label class="form-label">Name</label>
-                                                <input type="text" class="form-control" name="name" required>
+                                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="name" id="signupName" required>
+                                                <div class="invalid-feedback" id="signupNameError"></div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" name="email" required>
+                                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                <input type="email" class="form-control" name="email" id="signupEmail" required>
+                                                <div class="invalid-feedback" id="signupEmailError"></div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Password</label>
-                                                <input type="password" class="form-control" name="password" required>
+                                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                                <div class="password-field">
+                                                    <input type="password" class="form-control" name="password" id="signupPassword" required minlength="6">
+                                                    <i class="fas fa-eye password-toggle" onclick="togglePasswordVisibility('signupPassword', this)"></i>
+                                                </div>
+                                                <div class="invalid-feedback" id="signupPasswordError"></div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Role</label>
+                                                <label class="form-label">Role <span class="text-danger">*</span></label>
                                                 <select class="form-control" name="role" id="roleSelect" onchange="toggleBusinessDetails()" required>
                                                     <option value="">Select Role</option>
                                                     <option value="customer">Customer</option>
                                                     <option value="vendor">Vendor/Supplier</option>
                                                     <option value="delivery">Delivery Partner</option>
                                                 </select>
+                                                <div class="invalid-feedback" id="signupRoleError"></div>
                                             </div>
                                             <div class="mb-3 d-none" id="businessDetailsSection">
-                                                <label class="form-label">Business Details</label>
-                                                <textarea class="form-control" name="businessDetails" rows="3" placeholder="Describe your business, shop location, products you deal with, etc."></textarea>
+                                                <label class="form-label">Business Details <span class="text-danger">*</span></label>
+                                                <textarea class="form-control" name="businessDetails" id="businessDetails" rows="3" placeholder="Describe your business, shop location, products you deal with, etc."></textarea>
+                                                <div class="invalid-feedback" id="businessDetailsError"></div>
                                             </div>
                                             <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                                         </form>
