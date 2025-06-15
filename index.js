@@ -206,9 +206,13 @@ app.post('/api/auth/signin', async (req, res) => {
 });
 
 // Product Routes
-app.post('/api/products', authenticateToken, requireRole(['vendor']), upload.single('image'), (req, res) => {
+app.post('/api/products', authenticateToken, requireRole(['vendor']), upload.array('images', 10), (req, res) => {
   try {
     const { name, description, price, category, stock, countryOfOrigin } = req.body;
+    
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'At least one image is required' });
+    }
     
     const product = {
       id: uuidv4(),
@@ -219,7 +223,8 @@ app.post('/api/products', authenticateToken, requireRole(['vendor']), upload.sin
       category,
       stock: parseInt(stock),
       countryOfOrigin,
-      image: req.file ? `/uploads/${req.file.filename}` : null,
+      image: `/uploads/${req.files[0].filename}`, // Main image (first one)
+      images: req.files.map(file => `/uploads/${file.filename}`), // All images
       createdAt: new Date().toISOString()
     };
 
@@ -256,7 +261,7 @@ app.get('/api/vendor/products', authenticateToken, requireRole(['vendor']), (req
   }
 });
 
-app.put('/api/products/:productId', authenticateToken, requireRole(['vendor']), upload.single('image'), (req, res) => {
+app.put('/api/products/:productId', authenticateToken, requireRole(['vendor']), upload.array('images', 10), (req, res) => {
   try {
     const { productId } = req.params;
     const { name, description, price, category, stock, countryOfOrigin } = req.body;
@@ -276,16 +281,26 @@ app.put('/api/products/:productId', authenticateToken, requireRole(['vendor']), 
     product.stock = parseInt(stock);
     product.countryOfOrigin = countryOfOrigin;
     
-    // Update image if new one provided
-    if (req.file) {
-      // Remove old image file if it exists
-      if (product.image) {
+    // Update images if new ones provided
+    if (req.files && req.files.length > 0) {
+      // Remove old image files if they exist
+      if (product.images && product.images.length > 0) {
+        product.images.forEach(imagePath => {
+          const oldImagePath = path.join(__dirname, 'public', imagePath);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+          }
+        });
+      } else if (product.image) {
+        // Handle legacy single image
         const oldImagePath = path.join(__dirname, 'public', product.image);
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
       }
-      product.image = `/uploads/${req.file.filename}`;
+      
+      product.image = `/uploads/${req.files[0].filename}`; // Main image (first one)
+      product.images = req.files.map(file => `/uploads/${file.filename}`); // All images
     }
     
     product.updatedAt = new Date().toISOString();

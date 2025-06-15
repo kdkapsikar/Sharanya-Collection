@@ -680,16 +680,17 @@ class SharanyaCollections {
                     <div class="invalid-feedback" id="productCountryError"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Product Image ${editMode ? '' : '<span class="text-danger">*</span>'}</label>
+                    <label class="form-label">Product Images <span class="text-danger">*</span> (At least one image required)</label>
                     ${editMode && product.image ? `
                         <div class="mb-2">
                             <img src="${product.image}" class="img-fluid rounded" style="max-height: 150px; max-width: 100%; object-fit: contain; border: 1px solid #dee2e6;">
                             <div class="small text-muted mt-1">Current image (upload new to replace)</div>
                         </div>
                     ` : ''}
-                    <input type="file" class="form-control" name="image" id="productImage" accept="image/*" onchange="app.previewImage(this)" ${editMode ? '' : 'required'}>
-                    <div class="invalid-feedback" id="productImageError"></div>
-                    <div id="imagePreview" class="mt-2"></div>
+                    <input type="file" class="form-control" name="images" id="productImages" accept="image/*" multiple onchange="app.previewImages(this)" required>
+                    <div class="invalid-feedback" id="productImagesError"></div>
+                    <div class="small text-muted">You can select multiple images. The first image will be the main product image.</div>
+                    <div id="imagesPreview" class="mt-2"></div>
                     <div id="imageCropContainer" class="mt-2 d-none">
                         <canvas id="cropCanvas" style="max-width: 100%; border: 1px solid #dee2e6;"></canvas>
                         <div class="mt-2">
@@ -822,52 +823,78 @@ class SharanyaCollections {
             countryError.textContent = '';
         }
         
-        // Validate image (optional for edit mode)
-        const image = document.getElementById('productImage');
-        const imageError = document.getElementById('productImageError');
-        if (!editMode && (!image.files || image.files.length === 0)) {
-            image.classList.add('is-invalid');
-            imageError.textContent = 'Product image is required';
+        // Validate images (at least one required for new products, optional for edit mode)
+        const images = document.getElementById('productImages');
+        const imagesError = document.getElementById('productImagesError');
+        if (!editMode && (!images.files || images.files.length === 0)) {
+            images.classList.add('is-invalid');
+            imagesError.textContent = 'At least one product image is required';
             isValid = false;
-        } else if (image.files && image.files.length > 0) {
-            const file = image.files[0];
+        } else if (images.files && images.files.length > 0) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                image.classList.add('is-invalid');
-                imageError.textContent = 'Please select a valid image file (JPEG, PNG, GIF)';
-                isValid = false;
-            } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                image.classList.add('is-invalid');
-                imageError.textContent = 'Image size must be less than 5MB';
-                isValid = false;
+            let hasInvalidFile = false;
+            
+            for (let i = 0; i < images.files.length; i++) {
+                const file = images.files[i];
+                if (!validTypes.includes(file.type)) {
+                    images.classList.add('is-invalid');
+                    imagesError.textContent = 'Please select valid image files (JPEG, PNG, GIF)';
+                    hasInvalidFile = true;
+                    break;
+                } else if (file.size > 5 * 1024 * 1024) { // 5MB limit per file
+                    images.classList.add('is-invalid');
+                    imagesError.textContent = 'Each image size must be less than 5MB';
+                    hasInvalidFile = true;
+                    break;
+                }
+            }
+            
+            if (!hasInvalidFile) {
+                images.classList.remove('is-invalid');
+                imagesError.textContent = '';
             } else {
-                image.classList.remove('is-invalid');
-                imageError.textContent = '';
+                isValid = false;
             }
         } else {
-            image.classList.remove('is-invalid');
-            imageError.textContent = '';
+            images.classList.remove('is-invalid');
+            imagesError.textContent = '';
         }
         
         return isValid;
     }
 
-    previewImage(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    this.originalImage = img;
-                    this.showImagePreview(img);
+    previewImages(input) {
+        const previewContainer = document.getElementById('imagesPreview');
+        previewContainer.innerHTML = '';
+        
+        if (input.files && input.files.length > 0) {
+            Array.from(input.files).forEach((file, index) => {
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'border rounded p-2 mb-2';
+                    imageDiv.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <img src="${e.target.result}" class="img-thumbnail me-2" style="max-height: 80px; max-width: 80px; object-fit: cover;">
+                            <div>
+                                <div class="fw-bold">${index === 0 ? 'Main Image' : `Image ${index + 1}`}</div>
+                                <small class="text-muted">${file.name}</small><br>
+                                <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                            </div>
+                        </div>
+                    `;
+                    previewContainer.appendChild(imageDiv);
                 };
-                img.src = e.target.result;
-            };
-            
-            reader.readAsDataURL(file);
+                
+                reader.readAsDataURL(file);
+            });
         }
+    }
+
+    previewImage(input) {
+        // Keep the old function for backward compatibility
+        this.previewImages(input);
     }
 
     showImagePreview(img) {
@@ -1044,13 +1071,13 @@ class SharanyaCollections {
                 this.showAlert('Product added successfully!', 'success');
                 e.target.reset();
                 // Clear image preview
-                const imagePreview = document.getElementById('imagePreview');
+                const imagesPreview = document.getElementById('imagesPreview');
                 const imageCropContainer = document.getElementById('imageCropContainer');
-                if (imagePreview) imagePreview.innerHTML = '';
+                if (imagesPreview) imagesPreview.innerHTML = '';
                 if (imageCropContainer) imageCropContainer.classList.add('d-none');
                 
                 // Clear validation states
-                const fields = ['productName', 'productDescription', 'productPrice', 'productCategory', 'productStock', 'productCountry', 'productImage'];
+                const fields = ['productName', 'productDescription', 'productPrice', 'productCategory', 'productStock', 'productCountry', 'productImages'];
                 fields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
                     if (field) {
