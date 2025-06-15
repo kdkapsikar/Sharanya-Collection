@@ -95,20 +95,22 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
                     </li>
+                    <li class="nav-item d-none" id="dashboardLink">
+                        <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
+                    </li>
                     <li class="nav-item" id="authLinks">
                         <a class="nav-link" href="#" onclick="showSection('auth')">Sign In / Sign Up</a>
                     </li>
-                    <li class="nav-item d-none" id="userMenu">
-                        <div class="dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <span id="userName"></span>
-                                <span class="badge bg-info ms-2" id="userRole"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="showDashboard()">Dashboard</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
-                            </ul>
-                        </div>
+                    <li class="nav-item d-none" id="userInfo">
+                        <span class="nav-link">
+                            <span id="userName"></span>
+                            <span class="badge bg-info ms-2" id="userRole"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item d-none" id="logoutLink">
+                        <a class="nav-link" href="#" onclick="logout()" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
                     </li>
                 </ul>
             </div>
