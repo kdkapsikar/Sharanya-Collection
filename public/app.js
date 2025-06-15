@@ -343,11 +343,20 @@ class SharanyaCollections {
             }
             localStorage.setItem('cart', JSON.stringify(this.cart));
             this.showAlert('Product added to cart!', 'success');
+            
+            // If currently viewing dashboard, refresh it to show updated cart
+            const dashboardSection = document.getElementById('dashboardSection');
+            if (!dashboardSection.classList.contains('d-none')) {
+                this.showDashboard();
+            }
         }
     }
 
     async showDashboard() {
         if (!this.currentUser) return;
+
+        // Refresh cart from localStorage
+        this.cart = JSON.parse(localStorage.getItem('cart')) || [];
 
         this.showSection('dashboard');
         const dashboardContent = document.getElementById('dashboardContent');
