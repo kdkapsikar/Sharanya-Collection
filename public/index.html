@@ -87,6 +87,91 @@
             color: #495057;
         }
         
+        /* Honeycomb Pattern */
+        .honeycomb-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+            overflow: hidden;
+        }
+        
+        .honeycomb {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .hex {
+            width: 30px;
+            height: 17px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 8.5px 0;
+            position: relative;
+            border-radius: 3px;
+            animation: hexFloat 3s ease-in-out infinite;
+        }
+        
+        .hex:before,
+        .hex:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+        }
+        
+        .hex:before {
+            bottom: 100%;
+            border-bottom: 8.5px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hex:after {
+            top: 100%;
+            border-top: 8.5px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hex:nth-child(1) { animation-delay: 0s; }
+        .hex:nth-child(2) { animation-delay: 0.3s; }
+        .hex:nth-child(3) { animation-delay: 0.6s; }
+        .hex:nth-child(4) { animation-delay: 0.9s; }
+        .hex:nth-child(5) { animation-delay: 1.2s; }
+        .hex:nth-child(6) { animation-delay: 1.5s; }
+        .hex:nth-child(7) { animation-delay: 1.8s; }
+        .hex:nth-child(8) { animation-delay: 2.1s; }
+        
+        @keyframes hexFloat {
+            0%, 100% { 
+                transform: translateY(0px);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .honeycomb-container {
+                padding: 10px 0;
+            }
+            .hex {
+                width: 20px;
+                height: 11px;
+                margin: 5.5px 0;
+            }
+            .hex:before {
+                border-left-width: 10px;
+                border-right-width: 10px;
+                border-bottom-width: 5.5px;
+            }
+            .hex:after {
+                border-left-width: 10px;
+                border-right-width: 10px;
+                border-top-width: 5.5px;
+            }
+        }
+        
         /* Mobile specific styles */
         @media (max-width: 767.98px) {
             .hero-section .display-4 {
@@ -165,9 +250,18 @@
         </div>
     </nav>
 
-    <!-- Role Badge -->
-    <div class="role-badge d-none" id="roleBadge">
-        <span class="badge bg-info"></span>
+    <!-- Honeycomb Pattern -->
+    <div class="honeycomb-container d-none" id="honeycombPattern">
+        <div class="honeycomb">
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+            <div class="hex"></div>
+        </div>
     </div>
 
     <!-- Main Content -->
