@@ -663,6 +663,7 @@ class SharanyaCollections {
             if (response.ok) {
                 this.showAlert('Product added successfully!', 'success');
                 e.target.reset();
+                await this.loadProducts(); // Reload products to show the new one
                 this.showDashboard(); // Refresh dashboard
             } else {
                 this.showAlert(result.error, 'danger');
@@ -782,7 +783,7 @@ class SharanyaCollections {
         return []; // Placeholder
     }
 
-    showSection(sectionName) {
+    async showSection(sectionName) {
         // Hide all sections
         const sections = ['homeSection', 'productsSection', 'authSection', 'dashboardSection'];
         sections.forEach(section => {
@@ -791,6 +792,11 @@ class SharanyaCollections {
 
         // Show selected section
         document.getElementById(sectionName + 'Section').classList.remove('d-none');
+        
+        // Reload products when navigating to products section
+        if (sectionName === 'products') {
+            await this.loadProducts();
+        }
     }
 
     showAlert(message, type) {

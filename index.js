@@ -126,17 +126,27 @@ app.post('/api/auth/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('Login attempt for email:', email);
+    console.log('Total users in system:', users.length);
+    console.log('All user emails:', users.map(u => u.email));
+
     // Find user
     const user = users.find(u => u.email === email);
     if (!user) {
+      console.log('User not found for email:', email);
       return res.status(400).json({ error: 'Invalid credentials' });
     }
+
+    console.log('User found:', { id: user.id, email: user.email, role: user.role, isApproved: user.isApproved });
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       return res.status(400).json({ error: 'Invalid credentials' });
     }
+
+    console.log('Password match successful for user:', email);
 
     // Check if user is approved
     if (!user.isApproved) {
