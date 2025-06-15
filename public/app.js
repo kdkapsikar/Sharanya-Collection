@@ -663,6 +663,7 @@ class SharanyaCollections {
             if (response.ok) {
                 this.showAlert('Product added successfully!', 'success');
                 e.target.reset();
+                await this.loadProducts(); // Reload products to show the new one
                 this.showDashboard(); // Refresh dashboard
             } else {
                 this.showAlert(result.error, 'danger');
