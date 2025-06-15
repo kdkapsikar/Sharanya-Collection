@@ -181,6 +181,8 @@ class SharanyaCollections {
                     const payload = JSON.parse(atob(this.token.split('.')[1]));
                     this.currentUser = payload;
                     this.updateUI();
+                    // Reload products after authentication
+                    await this.loadProducts();
                 } else {
                     this.logout();
                 }
@@ -215,7 +217,9 @@ class SharanyaCollections {
                 this.currentUser = result.user;
                 localStorage.setItem('token', this.token);
                 this.updateUI();
-                this.showSection('home');
+                // Reload products after login
+                await this.loadProducts();
+                this.showDashboard();
                 this.showAlert('Login successful!', 'success');
             } else {
                 this.showAlert(result.error, 'danger');
@@ -251,7 +255,9 @@ class SharanyaCollections {
                     this.currentUser = result.user;
                     localStorage.setItem('token', this.token);
                     this.updateUI();
-                    this.showSection('home');
+                    // Reload products after signup
+                    await this.loadProducts();
+                    this.showDashboard();
                     this.showAlert('Account created successfully!', 'success');
                 } else {
                     this.showAlert('Account created! Waiting for admin approval.', 'info');
@@ -274,33 +280,25 @@ class SharanyaCollections {
 
     updateUI() {
         const authLinks = document.getElementById('authLinks');
-        const homeLink = document.getElementById('homeLink');
-        const dashboardLink = document.getElementById('dashboardLink');
-        const productsLink = document.getElementById('productsLink');
         const userInfo = document.getElementById('userInfo');
         const logoutLink = document.getElementById('logoutLink');
-        const roleBadge = document.getElementById('roleBadge');
+        const honeycombPattern = document.getElementById('honeycombPattern');
+        const secondaryNav = document.getElementById('secondaryNav');
 
         if (this.currentUser) {
             authLinks.classList.add('d-none');
-            homeLink.classList.remove('d-none');
-            dashboardLink.classList.remove('d-none');
-            productsLink.classList.remove('d-none');
             userInfo.classList.remove('d-none');
             logoutLink.classList.remove('d-none');
-            roleBadge.classList.remove('d-none');
+            honeycombPattern.classList.remove('d-none');
+            secondaryNav.classList.remove('d-none');
             
             document.getElementById('userName').textContent = this.currentUser.name;
-            document.getElementById('userRole').textContent = this.currentUser.role.toUpperCase();
-            roleBadge.querySelector('.badge').textContent = this.currentUser.role.toUpperCase();
         } else {
             authLinks.classList.remove('d-none');
-            homeLink.classList.add('d-none');
-            dashboardLink.classList.add('d-none');
-            productsLink.classList.add('d-none');
             userInfo.classList.add('d-none');
             logoutLink.classList.add('d-none');
-            roleBadge.classList.add('d-none');
+            honeycombPattern.classList.add('d-none');
+            secondaryNav.classList.add('d-none');
         }
     }
 
@@ -309,7 +307,10 @@ class SharanyaCollections {
             const response = await fetch('/api/products');
             if (response.ok) {
                 this.products = await response.json();
+                console.log('Products loaded:', this.products.length);
                 this.displayProducts();
+            } else {
+                console.error('Failed to load products:', response.status);
             }
         } catch (error) {
             console.error('Error loading products:', error);
@@ -403,6 +404,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Customer Portal</h6>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
@@ -443,6 +447,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Vendor Portal</h6>
+            </div>
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -482,6 +489,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Delivery Portal</h6>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-truck"></i> Assigned Deliveries</h5>
@@ -519,6 +529,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Admin Portal</h6>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
