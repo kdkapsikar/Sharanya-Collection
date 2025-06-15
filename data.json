@@ -60,8 +60,12 @@
       "category": "Jewellery",
       "stock": 1,
       "countryOfOrigin": "India",
-      "image": "/uploads/1749971449795-DSCN9957.JPG",
-      "createdAt": "2025-06-15T07:10:54.382Z"
+      "image": "/uploads/1749973070854-DSCN9968.JPG",
+      "createdAt": "2025-06-15T07:10:54.382Z",
+      "images": [
+        "/uploads/1749973070854-DSCN9968.JPG"
+      ],
+      "updatedAt": "2025-06-15T07:37:51.590Z"
     },
     {
       "id": "fc9c80ba-b3b4-4bc6-9cac-b6fb40a9e31c",
