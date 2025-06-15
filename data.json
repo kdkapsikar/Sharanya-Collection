@@ -30,7 +30,20 @@
       "createdAt": "2025-06-15T05:53:11.962Z"
     }
   ],
-  "products": [],
+  "products": [
+    {
+      "id": "9f42e2f0-60d0-455c-9524-52e04eb5e26f",
+      "vendorId": "fd258163-42cc-420c-b587-0f13acdad3b4",
+      "name": "Necklace and earring set",
+      "description": "Necklace and earring set",
+      "price": 400,
+      "category": "Jewellery",
+      "stock": 1,
+      "countryOfOrigin": "India",
+      "image": "/uploads/1749971449795-DSCN9957.JPG",
+      "createdAt": "2025-06-15T07:10:54.382Z"
+    }
+  ],
   "orders": [],
   "deliveryPersonnel": []
 }
