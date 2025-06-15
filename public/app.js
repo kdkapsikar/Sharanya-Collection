@@ -324,19 +324,27 @@ class SharanyaCollections {
         this.products.forEach(product => {
             const productCard = `
                 <div class="col-md-4 mb-4">
-                    <div class="card">
-                        ${product.image ? `<img src="${product.image}" class="card-img-top product-image" alt="${product.name}">` : ''}
-                        <div class="card-body">
+                    <div class="card h-100">
+                        ${product.image ? `
+                            <div style="height: 250px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
+                                <img src="${product.image}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
+                            </div>
+                        ` : `
+                            <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; color: #6c757d;">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                        `}
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title">${product.name}</h5>
-                            <p class="card-text">${product.description}</p>
-                            <p class="text-muted">Vendor: ${product.vendorName}</p>
-                            <p class="text-muted">Country: ${product.countryOfOrigin}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h5 text-primary">₹${product.price}</span>
+                            <p class="card-text flex-grow-1">${product.description}</p>
+                            <p class="text-muted mb-1">Vendor: ${product.vendorName}</p>
+                            <p class="text-muted mb-3">Country: ${product.countryOfOrigin}</p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="h5 text-primary mb-0">₹${product.price}</span>
                                 <span class="badge bg-secondary">Stock: ${product.stock}</span>
                             </div>
                             ${this.currentUser && this.currentUser.role === 'customer' ? 
-                                `<button class="btn btn-primary w-100 mt-2" onclick="app.addToCart('${product.id}')">Add to Cart</button>` : ''}
+                                `<button class="btn btn-primary w-100" onclick="app.addToCart('${product.id}')">Add to Cart</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -446,6 +454,9 @@ class SharanyaCollections {
             console.error('Error loading vendor products:', error);
         }
 
+        // Store products for edit functionality
+        this.vendorProducts = vendorProducts;
+
         return `
             <div class="mb-4">
                 <h6 class="text-muted mb-0">Vendor Portal</h6>
@@ -456,17 +467,17 @@ class SharanyaCollections {
                         <div class="card-header">
                             <h5><i class="fas fa-boxes"></i> My Products</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="vendorProductsList">
                             ${vendorProducts.length > 0 ? this.renderVendorProducts(vendorProducts) : '<p>No products added yet</p>'}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card">
+                    <div class="card" id="productFormCard">
                         <div class="card-header">
-                            <h5><i class="fas fa-plus"></i> Add New Product</h5>
+                            <h5 id="productFormTitle"><i class="fas fa-plus"></i> Add New Product</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="productFormBody">
                             ${this.renderAddProductForm()}
                         </div>
                     </div>
@@ -603,53 +614,84 @@ class SharanyaCollections {
 
     renderVendorProducts(products) {
         return products.map(product => `
-            <div class="border-bottom py-2">
-                <strong>${product.name}</strong><br>
-                <small>Price: ₹${product.price} | Stock: ${product.stock}</small><br>
-                <small>Category: ${product.category}</small>
+            <div class="border-bottom py-2 mb-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        ${product.image ? `<img src="${product.image}" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">` : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 100px;"><small>No Image</small></div>'}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>${product.name}</strong><br>
+                        <small>Price: ₹${product.price} | Stock: ${product.stock}</small><br>
+                        <small>Category: ${product.category}</small><br>
+                        <small>Country: ${product.countryOfOrigin}</small>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-sm btn-outline-primary mb-1" onclick="app.editProduct('${product.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                </div>
             </div>
         `).join('');
     }
 
-    renderAddProductForm() {
+    renderAddProductForm(editMode = false, product = null) {
         return `
-            <form id="addProductForm" onsubmit="app.addProduct(event)">
+            <form id="${editMode ? 'editProductForm' : 'addProductForm'}" onsubmit="app.${editMode ? 'updateProduct' : 'addProduct'}(event)">
+                ${editMode ? `<input type="hidden" name="productId" value="${product.id}">` : ''}
                 <div class="mb-3">
                     <label class="form-label">Product Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="name" id="productName" placeholder="Product Name" required>
+                    <input type="text" class="form-control" name="name" id="productName" placeholder="Product Name" value="${editMode ? product.name : ''}" required>
                     <div class="invalid-feedback" id="productNameError"></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Description <span class="text-danger">*</span></label>
-                    <textarea class="form-control" name="description" id="productDescription" placeholder="Description" rows="2" required></textarea>
+                    <textarea class="form-control" name="description" id="productDescription" placeholder="Description" rows="2" required>${editMode ? product.description : ''}</textarea>
                     <div class="invalid-feedback" id="productDescriptionError"></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Price <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" name="price" id="productPrice" placeholder="Price" step="0.01" required>
+                    <input type="number" class="form-control" name="price" id="productPrice" placeholder="Price" step="0.01" value="${editMode ? product.price : ''}" required>
                     <div class="invalid-feedback" id="productPriceError"></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Category <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="category" id="productCategory" placeholder="Category" required>
+                    <input type="text" class="form-control" name="category" id="productCategory" placeholder="Category" value="${editMode ? product.category : ''}" required>
                     <div class="invalid-feedback" id="productCategoryError"></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Stock Quantity <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" name="stock" id="productStock" placeholder="Stock Quantity" required>
+                    <input type="number" class="form-control" name="stock" id="productStock" placeholder="Stock Quantity" value="${editMode ? product.stock : ''}" required>
                     <div class="invalid-feedback" id="productStockError"></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Country of Origin <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="countryOfOrigin" id="productCountry" placeholder="Country of Origin" required>
+                    <input type="text" class="form-control" name="countryOfOrigin" id="productCountry" placeholder="Country of Origin" value="${editMode ? product.countryOfOrigin : ''}" required>
                     <div class="invalid-feedback" id="productCountryError"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Product Image <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control" name="image" id="productImage" accept="image/*" required>
+                    <label class="form-label">Product Image ${editMode ? '' : '<span class="text-danger">*</span>'}</label>
+                    ${editMode && product.image ? `
+                        <div class="mb-2">
+                            <img src="${product.image}" class="img-fluid rounded" style="max-height: 150px; max-width: 100%; object-fit: contain; border: 1px solid #dee2e6;">
+                            <div class="small text-muted mt-1">Current image (upload new to replace)</div>
+                        </div>
+                    ` : ''}
+                    <input type="file" class="form-control" name="image" id="productImage" accept="image/*" onchange="app.previewImage(this)" ${editMode ? '' : 'required'}>
                     <div class="invalid-feedback" id="productImageError"></div>
+                    <div id="imagePreview" class="mt-2"></div>
+                    <div id="imageCropContainer" class="mt-2 d-none">
+                        <canvas id="cropCanvas" style="max-width: 100%; border: 1px solid #dee2e6;"></canvas>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="app.resizeImage(0.5)">50% Size</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="app.resizeImage(0.75)">75% Size</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="app.resizeImage(1.0)">Original Size</button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="app.applyImageChanges()">Apply Changes</button>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Add Product</button>
+                <button type="submit" class="btn btn-primary w-100">${editMode ? 'Update Product' : 'Add Product'}</button>
+                ${editMode ? '<button type="button" class="btn btn-secondary w-100 mt-2" onclick="app.cancelEdit()">Cancel</button>' : ''}
             </form>
         `;
     }
@@ -695,7 +737,7 @@ class SharanyaCollections {
         `).join('');
     }
 
-    validateProductForm() {
+    validateProductForm(editMode = false) {
         let isValid = true;
         
         // Validate product name
@@ -770,14 +812,14 @@ class SharanyaCollections {
             countryError.textContent = '';
         }
         
-        // Validate image
+        // Validate image (optional for edit mode)
         const image = document.getElementById('productImage');
         const imageError = document.getElementById('productImageError');
-        if (!image.files || image.files.length === 0) {
+        if (!editMode && (!image.files || image.files.length === 0)) {
             image.classList.add('is-invalid');
             imageError.textContent = 'Product image is required';
             isValid = false;
-        } else {
+        } else if (image.files && image.files.length > 0) {
             const file = image.files[0];
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!validTypes.includes(file.type)) {
@@ -792,9 +834,166 @@ class SharanyaCollections {
                 image.classList.remove('is-invalid');
                 imageError.textContent = '';
             }
+        } else {
+            image.classList.remove('is-invalid');
+            imageError.textContent = '';
         }
         
         return isValid;
+    }
+
+    previewImage(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.originalImage = img;
+                    this.showImagePreview(img);
+                };
+                img.src = e.target.result;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+
+    showImagePreview(img) {
+        const canvas = document.getElementById('cropCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('imageCropContainer');
+        
+        // Calculate display size while maintaining aspect ratio
+        const maxWidth = 300;
+        const maxHeight = 200;
+        let { width, height } = img;
+        
+        if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width *= ratio;
+            height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        this.currentImageData = { img, width, height };
+        container.classList.remove('d-none');
+    }
+
+    resizeImage(scale) {
+        if (!this.originalImage) return;
+        
+        const canvas = document.getElementById('cropCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const newWidth = this.originalImage.width * scale;
+        const newHeight = this.originalImage.height * scale;
+        
+        // Update display size
+        const maxWidth = 300;
+        const maxHeight = 200;
+        let displayWidth = newWidth;
+        let displayHeight = newHeight;
+        
+        if (displayWidth > maxWidth || displayHeight > maxHeight) {
+            const ratio = Math.min(maxWidth / displayWidth, maxHeight / displayHeight);
+            displayWidth *= ratio;
+            displayHeight *= ratio;
+        }
+        
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+        ctx.drawImage(this.originalImage, 0, 0, newWidth, newHeight, 0, 0, displayWidth, displayHeight);
+        
+        this.currentImageData = { 
+            img: this.originalImage, 
+            width: newWidth, 
+            height: newHeight,
+            displayWidth,
+            displayHeight
+        };
+    }
+
+    applyImageChanges() {
+        if (!this.currentImageData) return;
+        
+        // Create final canvas with actual size
+        const finalCanvas = document.createElement('canvas');
+        const finalCtx = finalCanvas.getContext('2d');
+        
+        finalCanvas.width = this.currentImageData.width;
+        finalCanvas.height = this.currentImageData.height;
+        finalCtx.drawImage(this.currentImageData.img, 0, 0, this.currentImageData.width, this.currentImageData.height);
+        
+        // Convert to blob and update file input
+        finalCanvas.toBlob((blob) => {
+            const file = new File([blob], 'processed-image.jpg', { type: 'image/jpeg' });
+            
+            // Create new file input with processed image
+            const input = document.getElementById('productImage');
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            
+            this.showAlert('Image processed successfully!', 'success');
+        }, 'image/jpeg', 0.9);
+    }
+
+    editProduct(productId) {
+        const product = this.vendorProducts.find(p => p.id === productId);
+        if (!product) return;
+        
+        // Update form title and body
+        const formTitle = document.getElementById('productFormTitle');
+        const formBody = document.getElementById('productFormBody');
+        
+        formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Product';
+        formBody.innerHTML = this.renderAddProductForm(true, product);
+    }
+
+    cancelEdit() {
+        // Reset form to add mode
+        const formTitle = document.getElementById('productFormTitle');
+        const formBody = document.getElementById('productFormBody');
+        
+        formTitle.innerHTML = '<i class="fas fa-plus"></i> Add New Product';
+        formBody.innerHTML = this.renderAddProductForm(false);
+    }
+
+    async updateProduct(e) {
+        e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateProductForm(true)) {
+            return;
+        }
+        
+        const formData = new FormData(e.target);
+        const productId = formData.get('productId');
+
+        try {
+            const response = await fetch(`/api/products/${productId}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${this.token}` },
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                this.showAlert('Product updated successfully!', 'success');
+                await this.loadProducts(); // Reload products
+                this.showDashboard(); // Refresh dashboard
+            } else {
+                this.showAlert(result.error, 'danger');
+            }
+        } catch (error) {
+            this.showAlert('Failed to update product', 'danger');
+        }
     }
 
     async addProduct(e) {
@@ -819,6 +1018,12 @@ class SharanyaCollections {
             if (response.ok) {
                 this.showAlert('Product added successfully!', 'success');
                 e.target.reset();
+                // Clear image preview
+                const imagePreview = document.getElementById('imagePreview');
+                const imageCropContainer = document.getElementById('imageCropContainer');
+                if (imagePreview) imagePreview.innerHTML = '';
+                if (imageCropContainer) imageCropContainer.classList.add('d-none');
+                
                 // Clear validation states
                 const fields = ['productName', 'productDescription', 'productPrice', 'productCategory', 'productStock', 'productCountry', 'productImage'];
                 fields.forEach(fieldId => {
