@@ -70,6 +70,9 @@ let products = data.products;
 let orders = data.orders;
 let deliveryPersonnel = data.deliveryPersonnel;
 
+// In-memory storage for password reset codes (in production, use Redis or database)
+const passwordResetCodes = new Map();
+
 // Helper function to generate JWT token
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
@@ -104,12 +107,22 @@ const requireRole = (roles) => {
 // Auth Routes
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { name, email, password, role, businessDetails } = req.body;
+    const { name, email, mobile, password, role, businessDetails } = req.body;
     
-    // Check if user already exists
-    const existingUser = users.find(u => u.email === email);
+    // Check if user already exists (by email or mobile)
+    const existingUser = users.find(u => u.email === email || u.mobile === mobile);
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      if (existingUser.email === email) {
+        return res.status(400).json({ error: 'Email already exists' });
+      } else {
+        return res.status(400).json({ error: 'Mobile number already exists' });
+      }
+    }
+
+    // Validate mobile number
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobile || !mobileRegex.test(mobile)) {
+      return res.status(400).json({ error: 'Please provide a valid 10-digit mobile number' });
     }
 
     // Validate role
@@ -126,6 +139,7 @@ app.post('/api/auth/signup', async (req, res) => {
       id: uuidv4(),
       name,
       email,
+      mobile,
       password: hashedPassword,
       role,
       businessDetails: role === 'vendor' ? businessDetails : null,
@@ -146,6 +160,7 @@ app.post('/api/auth/signup', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         isApproved: user.isApproved
       }
@@ -196,11 +211,95 @@ app.post('/api/auth/signin', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         isApproved: user.isApproved
       }
     });
   } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Forgot Password Route
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Find user by email
+    const user = users.find(u => u.email === email);
+    if (!user) {
+      // Don't reveal if email exists or not for security
+      return res.json({ message: 'If the email exists, a reset code has been sent' });
+    }
+    
+    // Generate 6-digit reset code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store reset code with expiration (15 minutes)
+    passwordResetCodes.set(email, {
+      code: resetCode,
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      userId: user.id
+    });
+    
+    // In production, send email here
+    console.log(`Password reset code for ${email}: ${resetCode}`);
+    console.log('Reset code expires in 15 minutes');
+    
+    res.json({ message: 'Reset code sent to your email' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Reset Password Route
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email, resetCode, newPassword } = req.body;
+    
+    // Check if reset code exists and is valid
+    const resetData = passwordResetCodes.get(email);
+    if (!resetData) {
+      return res.status(400).json({ error: 'Invalid or expired reset code' });
+    }
+    
+    // Check if code has expired
+    if (Date.now() > resetData.expires) {
+      passwordResetCodes.delete(email);
+      return res.status(400).json({ error: 'Reset code has expired' });
+    }
+    
+    // Check if code matches
+    if (resetData.code !== resetCode) {
+      return res.status(400).json({ error: 'Invalid reset code' });
+    }
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === resetData.userId);
+    if (userIndex === -1) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update user password
+    users[userIndex].password = hashedPassword;
+    users[userIndex].updatedAt = new Date().toISOString();
+    
+    // Remove used reset code
+    passwordResetCodes.delete(email);
+    
+    // Save data
+    saveData();
+    
+    console.log(`Password reset successful for user: ${email}`);
+    
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -368,6 +467,7 @@ app.get('/api/admin/users', authenticateToken, requireRole(['admin']), (req, res
       id: u.id,
       name: u.name,
       email: u.email,
+      mobile: u.mobile,
       role: u.role,
       isApproved: u.isApproved,
       businessDetails: u.businessDetails,
@@ -434,6 +534,97 @@ app.post('/api/orders/:orderId/status', authenticateToken, (req, res) => {
     order.status = status;
     saveData();
     res.json({ message: 'Order status updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Profile management routes
+app.put('/api/profile', authenticateToken, (req, res) => {
+  try {
+    const { name, email, mobile, businessDetails } = req.body;
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Validate mobile number
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobile || !mobileRegex.test(mobile)) {
+      return res.status(400).json({ error: 'Please provide a valid 10-digit mobile number' });
+    }
+
+    // Check if email or mobile is already taken by another user
+    const existingUser = users.find(u => (u.email === email || u.mobile === mobile) && u.id !== req.user.id);
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ error: 'Email already in use by another account' });
+      } else {
+        return res.status(400).json({ error: 'Mobile number already in use by another account' });
+      }
+    }
+    
+    // Update user data
+    const user = users[userIndex];
+    user.name = name;
+    user.email = email;
+    user.mobile = mobile;
+    
+    if (user.role === 'vendor') {
+      user.businessDetails = businessDetails;
+    }
+    
+    user.updatedAt = new Date().toISOString();
+    
+    saveData();
+    
+    res.json({ 
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile,
+        role: user.role,
+        businessDetails: user.businessDetails,
+        isApproved: user.isApproved
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.put('/api/profile/password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const user = users[userIndex];
+    
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+    
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update password
+    user.password = hashedNewPassword;
+    user.updatedAt = new Date().toISOString();
+    
+    saveData();
+    
+    res.json({ message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }

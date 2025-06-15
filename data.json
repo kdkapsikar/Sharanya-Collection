@@ -51,13 +51,15 @@
     },
     {
       "id": "bf6eda94-4572-41fb-b025-95fae571bae0",
-      "name": "Customer",
+      "name": "Custom",
       "email": "Customer@sharanyacollection.com",
       "password": "$2a$12$8Wwygu2F.GWB0a63XTZ61O27bOYePAPtn.UY0XOstbJlhQOqIAHjK",
       "role": "customer",
       "businessDetails": null,
       "isApproved": true,
-      "createdAt": "2025-06-15T14:36:46.102Z"
+      "createdAt": "2025-06-15T14:36:46.102Z",
+      "mobile": "9999999999",
+      "updatedAt": "2025-06-15T15:24:54.248Z"
     }
   ],
   "products": [
