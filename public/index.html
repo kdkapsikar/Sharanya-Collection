@@ -98,16 +98,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
                     </li>
-                    <li class="nav-item" id="authLinks">
-                        <a class="nav-link" href="#" onclick="showSection('auth')">Sign In / Sign Up</a>
-                    </li>
-                </ul>
+                    </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item d-none" id="userInfo">
                         <span class="nav-link">
                             <span id="userName"></span>
                             <span class="badge bg-info ms-2" id="userRole"></span>
                         </span>
+                    </li>
+                    <li class="nav-item" id="authLinks">
+                        <a class="nav-link" href="#" onclick="showSection('auth')" title="Sign In / Sign Up">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </a>
                     </li>
                     <li class="nav-item d-none" id="logoutLink">
                         <a class="nav-link" href="#" onclick="logout()" title="Logout">
