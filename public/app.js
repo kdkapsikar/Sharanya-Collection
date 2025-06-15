@@ -20,6 +20,8 @@ class SharanyaCollections {
         // Auth forms
         document.getElementById('signinForm').addEventListener('submit', (e) => this.handleSignin(e));
         document.getElementById('signupForm').addEventListener('submit', (e) => this.handleSignup(e));
+        document.getElementById('forgotPasswordForm').addEventListener('submit', (e) => this.handleForgotPassword(e));
+        document.getElementById('resetPasswordForm').addEventListener('submit', (e) => this.handleResetPassword(e));
         
         // Add real-time validation
         this.setupFormValidation();
@@ -47,6 +49,17 @@ class SharanyaCollections {
         signupPassword.addEventListener('blur', () => this.validateSignupPassword());
         roleSelect.addEventListener('change', () => this.validateRole());
         businessDetails.addEventListener('blur', () => this.validateBusinessDetails());
+        
+        // Forgot password form validation
+        const forgotEmail = document.getElementById('forgotEmail');
+        const resetCode = document.getElementById('resetCode');
+        const newPassword = document.getElementById('newPassword');
+        const confirmNewPassword = document.getElementById('confirmNewPassword');
+        
+        forgotEmail.addEventListener('blur', () => this.validateForgotEmail());
+        resetCode.addEventListener('blur', () => this.validateResetCode());
+        newPassword.addEventListener('blur', () => this.validateNewPassword());
+        confirmNewPassword.addEventListener('blur', () => this.validateConfirmNewPassword());
     }
 
     validateField(field, errorId, message) {
@@ -193,6 +206,105 @@ class SharanyaCollections {
         return isValid;
     }
 
+    validateForgotEmail() {
+        const email = document.getElementById('forgotEmail');
+        const errorElement = document.getElementById('forgotEmailError');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!email.value.trim()) {
+            email.classList.add('is-invalid');
+            errorElement.textContent = 'Email is required';
+            return false;
+        } else if (!emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            errorElement.textContent = 'Please enter a valid email address';
+            return false;
+        } else {
+            email.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateResetCode() {
+        const code = document.getElementById('resetCode');
+        const errorElement = document.getElementById('resetCodeError');
+        const codeRegex = /^\d{6}$/;
+        
+        if (!code.value.trim()) {
+            code.classList.add('is-invalid');
+            errorElement.textContent = 'Reset code is required';
+            return false;
+        } else if (!codeRegex.test(code.value)) {
+            code.classList.add('is-invalid');
+            errorElement.textContent = 'Reset code must be 6 digits';
+            return false;
+        } else {
+            code.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateNewPassword() {
+        const password = document.getElementById('newPassword');
+        const errorElement = document.getElementById('newPasswordError');
+        
+        if (!password.value.trim()) {
+            password.classList.add('is-invalid');
+            errorElement.textContent = 'New password is required';
+            return false;
+        } else if (password.value.length < 6) {
+            password.classList.add('is-invalid');
+            errorElement.textContent = 'Password must be at least 6 characters long';
+            return false;
+        } else {
+            password.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateConfirmNewPassword() {
+        const password = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmNewPassword');
+        const errorElement = document.getElementById('confirmNewPasswordError');
+        
+        if (!confirmPassword.value.trim()) {
+            confirmPassword.classList.add('is-invalid');
+            errorElement.textContent = 'Please confirm your new password';
+            return false;
+        } else if (password.value !== confirmPassword.value) {
+            confirmPassword.classList.add('is-invalid');
+            errorElement.textContent = 'Passwords do not match';
+            return false;
+        } else {
+            confirmPassword.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    validateForgotPasswordForm() {
+        return this.validateForgotEmail();
+    }
+
+    validateResetPasswordForm() {
+        let isValid = true;
+        
+        if (!this.validateResetCode()) {
+            isValid = false;
+        }
+        if (!this.validateNewPassword()) {
+            isValid = false;
+        }
+        if (!this.validateConfirmNewPassword()) {
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
     async checkAuth() {
         if (this.token) {
             try {
@@ -293,6 +405,95 @@ class SharanyaCollections {
         } catch (error) {
             this.showAlert('Signup failed. Please try again.', 'danger');
         }
+    }
+
+    async handleForgotPassword(e) {
+        e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateForgotPasswordForm()) {
+            return;
+        }
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        try {
+            const response = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                // Show step 2 (reset code form)
+                document.getElementById('forgotPasswordStep1').classList.add('d-none');
+                document.getElementById('forgotPasswordStep2').classList.remove('d-none');
+                document.getElementById('resetEmail').value = data.email;
+                this.showAlert('Reset code sent to your email!', 'success');
+            } else {
+                this.showAlert(result.error, 'danger');
+            }
+        } catch (error) {
+            this.showAlert('Failed to send reset code. Please try again.', 'danger');
+        }
+    }
+
+    async handleResetPassword(e) {
+        e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateResetPasswordForm()) {
+            return;
+        }
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        try {
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                this.showAlert('Password reset successfully! You can now sign in with your new password.', 'success');
+                // Reset the form and go back to sign in
+                this.backToForgotStep1();
+                // Switch to sign in tab
+                const signinTab = document.querySelector('a[href="#signin"]');
+                const tab = new bootstrap.Tab(signinTab);
+                tab.show();
+            } else {
+                this.showAlert(result.error, 'danger');
+            }
+        } catch (error) {
+            this.showAlert('Failed to reset password. Please try again.', 'danger');
+        }
+    }
+
+    backToForgotStep1() {
+        document.getElementById('forgotPasswordStep2').classList.add('d-none');
+        document.getElementById('forgotPasswordStep1').classList.remove('d-none');
+        
+        // Clear form fields
+        document.getElementById('forgotPasswordForm').reset();
+        document.getElementById('resetPasswordForm').reset();
+        
+        // Clear validation states
+        ['forgotEmail', 'resetCode', 'newPassword', 'confirmNewPassword'].forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.classList.remove('is-invalid');
+                const errorElement = document.getElementById(fieldId + 'Error');
+                if (errorElement) errorElement.textContent = '';
+            }
+        });
     }
 
     logout() {

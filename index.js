@@ -70,6 +70,9 @@ let products = data.products;
 let orders = data.orders;
 let deliveryPersonnel = data.deliveryPersonnel;
 
+// In-memory storage for password reset codes (in production, use Redis or database)
+const passwordResetCodes = new Map();
+
 // Helper function to generate JWT token
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
@@ -214,6 +217,89 @@ app.post('/api/auth/signin', async (req, res) => {
       }
     });
   } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Forgot Password Route
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Find user by email
+    const user = users.find(u => u.email === email);
+    if (!user) {
+      // Don't reveal if email exists or not for security
+      return res.json({ message: 'If the email exists, a reset code has been sent' });
+    }
+    
+    // Generate 6-digit reset code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store reset code with expiration (15 minutes)
+    passwordResetCodes.set(email, {
+      code: resetCode,
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      userId: user.id
+    });
+    
+    // In production, send email here
+    console.log(`Password reset code for ${email}: ${resetCode}`);
+    console.log('Reset code expires in 15 minutes');
+    
+    res.json({ message: 'Reset code sent to your email' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Reset Password Route
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email, resetCode, newPassword } = req.body;
+    
+    // Check if reset code exists and is valid
+    const resetData = passwordResetCodes.get(email);
+    if (!resetData) {
+      return res.status(400).json({ error: 'Invalid or expired reset code' });
+    }
+    
+    // Check if code has expired
+    if (Date.now() > resetData.expires) {
+      passwordResetCodes.delete(email);
+      return res.status(400).json({ error: 'Reset code has expired' });
+    }
+    
+    // Check if code matches
+    if (resetData.code !== resetCode) {
+      return res.status(400).json({ error: 'Invalid reset code' });
+    }
+    
+    // Find user
+    const userIndex = users.findIndex(u => u.id === resetData.userId);
+    if (userIndex === -1) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update user password
+    users[userIndex].password = hashedPassword;
+    users[userIndex].updatedAt = new Date().toISOString();
+    
+    // Remove used reset code
+    passwordResetCodes.delete(email);
+    
+    // Save data
+    saveData();
+    
+    console.log(`Password reset successful for user: ${email}`);
+    
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
