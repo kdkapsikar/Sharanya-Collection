@@ -328,9 +328,38 @@ class SharanyaCollections {
             const productCard = `
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
-                        ${product.image ? `
-                            <div style="height: 250px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
-                                <img src="${product.image}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
+                        ${(product.images && product.images.length > 0) || product.image ? `
+                            <div style="height: 250px; overflow: hidden; position: relative; background: #f8f9fa;">
+                                ${product.images && product.images.length > 1 ? `
+                                    <div id="carousel-${product.id}" class="carousel slide h-100" data-bs-ride="carousel">
+                                        <div class="carousel-inner h-100">
+                                            ${product.images.map((img, index) => `
+                                                <div class="carousel-item ${index === 0 ? 'active' : ''} h-100">
+                                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                                        <img src="${img}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        ${product.images.length > 1 ? `
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-${product.id}" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-${product.id}" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="carousel-indicators">
+                                                ${product.images.map((_, index) => `
+                                                    <button type="button" data-bs-target="#carousel-${product.id}" data-bs-slide-to="${index}" ${index === 0 ? 'class="active"' : ''}></button>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                ` : `
+                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                        <img src="${product.images ? product.images[0] : product.image}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="${product.name}">
+                                    </div>
+                                `}
                             </div>
                         ` : `
                             <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; color: #6c757d;">
@@ -624,7 +653,14 @@ class SharanyaCollections {
             <div class="border-bottom py-2 mb-3">
                 <div class="row">
                     <div class="col-md-3">
-                        ${product.image ? `<img src="${product.image}" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">` : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 100px;"><small>No Image</small></div>'}
+                        ${(product.images && product.images.length > 0) || product.image ? `
+                            <div style="position: relative;">
+                                <img src="${product.images ? product.images[0] : product.image}" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                                ${product.images && product.images.length > 1 ? `
+                                    <span class="badge bg-primary position-absolute top-0 end-0 m-1">+${product.images.length - 1}</span>
+                                ` : ''}
+                            </div>
+                        ` : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 100px;"><small>No Image</small></div>'}
                     </div>
                     <div class="col-md-6">
                         <strong>${product.name}</strong><br>
@@ -678,10 +714,19 @@ class SharanyaCollections {
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Product Images <span class="text-danger">*</span> (At least one image required)</label>
-                    ${editMode && product.image ? `
+                    ${editMode && ((product.images && product.images.length > 0) || product.image) ? `
                         <div class="mb-2">
-                            <img src="${product.image}" class="img-fluid rounded" style="max-height: 150px; max-width: 100%; object-fit: contain; border: 1px solid #dee2e6;">
-                            <div class="small text-muted mt-1">Current image (upload new to replace)</div>
+                            <div class="small text-muted mb-2">Current images (upload new to replace):</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                ${product.images ? product.images.map((img, index) => `
+                                    <div style="position: relative;">
+                                        <img src="${img}" class="img-fluid rounded" style="max-height: 100px; max-width: 100px; object-fit: contain; border: 1px solid #dee2e6;">
+                                        <small class="position-absolute bottom-0 start-0 bg-dark text-white px-1 rounded-top-end">${index + 1}</small>
+                                    </div>
+                                `).join('') : `
+                                    <img src="${product.image}" class="img-fluid rounded" style="max-height: 100px; max-width: 100px; object-fit: contain; border: 1px solid #dee2e6;">
+                                `}
+                            </div>
                         </div>
                     ` : ''}
                     <input type="file" class="form-control" name="images" id="productImages" accept="image/*" multiple onchange="app.previewImages(this)" required>
