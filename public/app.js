@@ -215,7 +215,7 @@ class SharanyaCollections {
                 this.currentUser = result.user;
                 localStorage.setItem('token', this.token);
                 this.updateUI();
-                this.showSection('home');
+                this.showDashboard();
                 this.showAlert('Login successful!', 'success');
             } else {
                 this.showAlert(result.error, 'danger');
@@ -251,7 +251,7 @@ class SharanyaCollections {
                     this.currentUser = result.user;
                     localStorage.setItem('token', this.token);
                     this.updateUI();
-                    this.showSection('home');
+                    this.showDashboard();
                     this.showAlert('Account created successfully!', 'success');
                 } else {
                     this.showAlert('Account created! Waiting for admin approval.', 'info');
@@ -274,7 +274,6 @@ class SharanyaCollections {
 
     updateUI() {
         const authLinks = document.getElementById('authLinks');
-        const homeLink = document.getElementById('homeLink');
         const dashboardLink = document.getElementById('dashboardLink');
         const productsLink = document.getElementById('productsLink');
         const userInfo = document.getElementById('userInfo');
@@ -283,7 +282,6 @@ class SharanyaCollections {
 
         if (this.currentUser) {
             authLinks.classList.add('d-none');
-            homeLink.classList.remove('d-none');
             dashboardLink.classList.remove('d-none');
             productsLink.classList.remove('d-none');
             userInfo.classList.remove('d-none');
@@ -291,10 +289,8 @@ class SharanyaCollections {
             honeycombPattern.classList.remove('d-none');
             
             document.getElementById('userName').textContent = this.currentUser.name;
-            document.getElementById('userRole').textContent = this.currentUser.role.toUpperCase();
         } else {
             authLinks.classList.remove('d-none');
-            homeLink.classList.add('d-none');
             dashboardLink.classList.add('d-none');
             productsLink.classList.add('d-none');
             userInfo.classList.add('d-none');
@@ -402,6 +398,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-3">
+                <h5 class="text-muted">Customer Portal</h5>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
@@ -442,6 +441,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-3">
+                <h5 class="text-muted">Vendor Portal</h5>
+            </div>
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -481,6 +483,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-3">
+                <h5 class="text-muted">Delivery Portal</h5>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-truck"></i> Assigned Deliveries</h5>
@@ -518,6 +523,9 @@ class SharanyaCollections {
         }
 
         return `
+            <div class="mb-3">
+                <h5 class="text-muted">Admin Portal</h5>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
