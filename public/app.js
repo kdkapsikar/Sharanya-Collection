@@ -46,6 +46,14 @@ class SharanyaCollections {
         signupName.addEventListener('blur', () => this.validateField(signupName, 'signupNameError', 'Name is required'));
         signupEmail.addEventListener('blur', () => this.validateSignupEmail());
         signupMobile.addEventListener('blur', () => this.validateSignupMobile());
+        signupMobile.addEventListener('input', (e) => {
+            // Only allow numeric input
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            // Limit to 10 digits
+            if (e.target.value.length > 10) {
+                e.target.value = e.target.value.slice(0, 10);
+            }
+        });
         signupPassword.addEventListener('blur', () => this.validateSignupPassword());
         roleSelect.addEventListener('change', () => this.validateRole());
         businessDetails.addEventListener('blur', () => this.validateBusinessDetails());
@@ -104,9 +112,13 @@ class SharanyaCollections {
             mobile.classList.add('is-invalid');
             errorElement.textContent = 'Mobile number is required';
             return false;
+        } else if (mobile.value.length !== 10) {
+            mobile.classList.add('is-invalid');
+            errorElement.textContent = 'Mobile number must be exactly 10 digits';
+            return false;
         } else if (!mobileRegex.test(mobile.value)) {
             mobile.classList.add('is-invalid');
-            errorElement.textContent = 'Please enter a valid 10-digit mobile number';
+            errorElement.textContent = 'Mobile number must start with 6, 7, 8, or 9';
             return false;
         } else {
             mobile.classList.remove('is-invalid');
@@ -1582,7 +1594,10 @@ class SharanyaCollections {
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="mobile" id="editMobile" value="${this.currentUser.mobile || ''}" placeholder="Enter 10-digit mobile number" required>
+                    <div class="input-group">
+                        <span class="input-group-text">+91</span>
+                        <input type="tel" class="form-control" name="mobile" id="editMobile" value="${this.currentUser.mobile || ''}" placeholder="Enter 10-digit mobile number" maxlength="10" required>
+                    </div>
                     <div class="invalid-feedback" id="editMobileError"></div>
                 </div>
                 
@@ -1682,8 +1697,13 @@ class SharanyaCollections {
             return;
         }
         
+        if (data.mobile.length !== 10) {
+            this.showAlert('Mobile number must be exactly 10 digits', 'danger');
+            return;
+        }
+        
         if (!mobileRegex.test(data.mobile)) {
-            this.showAlert('Please enter a valid 10-digit mobile number', 'danger');
+            this.showAlert('Mobile number must start with 6, 7, 8, or 9', 'danger');
             return;
         }
 
