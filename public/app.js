@@ -274,28 +274,25 @@ class SharanyaCollections {
 
     updateUI() {
         const authLinks = document.getElementById('authLinks');
-        const dashboardLink = document.getElementById('dashboardLink');
-        const productsLink = document.getElementById('productsLink');
         const userInfo = document.getElementById('userInfo');
         const logoutLink = document.getElementById('logoutLink');
         const honeycombPattern = document.getElementById('honeycombPattern');
+        const secondaryNav = document.getElementById('secondaryNav');
 
         if (this.currentUser) {
             authLinks.classList.add('d-none');
-            dashboardLink.classList.remove('d-none');
-            productsLink.classList.remove('d-none');
             userInfo.classList.remove('d-none');
             logoutLink.classList.remove('d-none');
             honeycombPattern.classList.remove('d-none');
+            secondaryNav.classList.remove('d-none');
             
             document.getElementById('userName').textContent = this.currentUser.name;
         } else {
             authLinks.classList.remove('d-none');
-            dashboardLink.classList.add('d-none');
-            productsLink.classList.add('d-none');
             userInfo.classList.add('d-none');
             logoutLink.classList.add('d-none');
             honeycombPattern.classList.add('d-none');
+            secondaryNav.classList.add('d-none');
         }
     }
 

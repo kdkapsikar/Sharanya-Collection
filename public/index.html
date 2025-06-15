@@ -217,14 +217,6 @@
         <div class="container">
             <a class="navbar-brand" href="#"><i class="fas fa-store"></i> Sharanya Collections</a>
             <div class="d-flex align-items-center">
-                <ul class="navbar-nav d-flex flex-row me-3">
-                    <li class="nav-item d-none me-3" id="dashboardLink">
-                        <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
-                    </li>
-                    <li class="nav-item d-none me-3" id="productsLink">
-                        <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
-                    </li>
-                </ul>
                 <ul class="navbar-nav d-flex flex-row">
                     <li class="nav-item d-none me-3" id="userInfo">
                         <span class="nav-link">
@@ -259,6 +251,21 @@
             <div class="hex"></div>
         </div>
     </div>
+
+    <!-- Secondary Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light d-none" id="secondaryNav">
+        <div class="container">
+            <ul class="navbar-nav">
+                <li class="nav-item" id="dashboardLink">
+                    <a class="nav-link" href="#" onclick="showDashboard()">Dashboard</a>
+                </li>
+                <li class="nav-item" id="productsLink">
+                    <a class="nav-link" href="#" onclick="showSection('products')">Products</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</nav>
 
     <!-- Main Content -->
     <div id="app">
