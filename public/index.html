@@ -12,9 +12,13 @@
             color: #e91e63 !important;
         }
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            background-size: cover, 50px 50px;
             color: white;
             padding: 60px 0;
+            position: relative;
+            overflow: hidden;
         }
         @media (min-width: 768px) {
             .hero-section {
@@ -87,10 +91,21 @@
         }
 
         /* Honeycomb Pattern */
+        body {
+            background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="1" fill="rgba(0,0,0,0.05)"/></svg>');
+            background-size: cover, 60px 60px;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
         .honeycomb-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><polygon points="20,1 37,11 37,29 20,39 3,29 3,11" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>');
+            background-size: cover, 40px 40px;
             padding: 20px 0;
             overflow: hidden;
+            position: relative;
         }
 
         .honeycomb {
@@ -199,6 +214,98 @@
             white-space: nowrap;
         }
 
+        /* Section Backgrounds */
+        #productsSection {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" fill="none"/><g fill="rgba(102, 126, 234, 0.03)"><circle cx="40" cy="40" r="20"/><circle cx="0" cy="0" r="20"/><circle cx="80" cy="0" r="20"/><circle cx="0" cy="80" r="20"/><circle cx="80" cy="80" r="20"/></g></svg>');
+            background-size: cover, 80px 80px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #authSection {
+            background: linear-gradient(135deg, rgba(118, 75, 162, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wave" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M0 50 Q25 25 50 50 T100 50" stroke="rgba(102, 126, 234, 0.1)" stroke-width="1" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23wave)"/></svg>');
+            background-size: cover, 100px 100px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #dashboardSection {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><rect x="0" y="0" width="30" height="30" fill="rgba(102, 126, 234, 0.02)"/><rect x="30" y="30" width="30" height="30" fill="rgba(102, 126, 234, 0.02)"/></svg>');
+            background-size: cover, 60px 60px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #profileSection {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="10" fill="none" stroke="rgba(102, 126, 234, 0.1)" stroke-width="0.5"/><circle cx="0" cy="0" r="10" fill="none" stroke="rgba(102, 126, 234, 0.1)" stroke-width="0.5"/><circle cx="50" cy="0" r="10" fill="none" stroke="rgba(102, 126, 234, 0.1)" stroke-width="0.5"/><circle cx="0" cy="50" r="10" fill="none" stroke="rgba(102, 126, 234, 0.1)" stroke-width="0.5"/><circle cx="50" cy="50" r="10" fill="none" stroke="rgba(102, 126, 234, 0.1)" stroke-width="0.5"/></svg>');
+            background-size: cover, 50px 50px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Enhanced Card Styling */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(233, 30, 99, 0.3);
+            box-shadow: 0 8px 32px rgba(233, 30, 99, 0.1);
+        }
+
+        .portal-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(233, 30, 99, 0.5);
+            box-shadow: 0 12px 40px rgba(233, 30, 99, 0.2);
+        }
+
+        /* Navbar Enhancement */
+        .navbar-dark {
+            background: rgba(52, 58, 64, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-light {
+            background: rgba(248, 249, 250, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Floating Elements Animation */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
         @media (max-width: 767.98px) {
             .navbar .nav-link {
                 font-size: 0.9rem;
@@ -206,6 +313,15 @@
             }
             .navbar-brand {
                 font-size: 1rem;
+            }
+            
+            /* Adjust background patterns for mobile */
+            body {
+                background-size: cover, 40px 40px;
+            }
+            
+            .honeycomb-container {
+                background-size: cover, 30px 30px;
             }
         }
     </style>
