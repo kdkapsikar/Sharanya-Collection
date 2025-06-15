@@ -398,8 +398,8 @@ class SharanyaCollections {
         }
 
         return `
-            <div class="mb-3">
-                <h5 class="text-muted">Customer Portal</h5>
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Customer Portal</h6>
             </div>
             <div class="row">
                 <div class="col-md-6">
@@ -441,8 +441,8 @@ class SharanyaCollections {
         }
 
         return `
-            <div class="mb-3">
-                <h5 class="text-muted">Vendor Portal</h5>
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Vendor Portal</h6>
             </div>
             <div class="row">
                 <div class="col-md-8">
@@ -483,8 +483,8 @@ class SharanyaCollections {
         }
 
         return `
-            <div class="mb-3">
-                <h5 class="text-muted">Delivery Portal</h5>
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Delivery Portal</h6>
             </div>
             <div class="card">
                 <div class="card-header">
@@ -523,8 +523,8 @@ class SharanyaCollections {
         }
 
         return `
-            <div class="mb-3">
-                <h5 class="text-muted">Admin Portal</h5>
+            <div class="mb-4">
+                <h6 class="text-muted mb-0">Admin Portal</h6>
             </div>
             <div class="row">
                 <div class="col-md-6">
