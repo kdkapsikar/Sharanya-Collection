@@ -321,7 +321,13 @@ class SharanyaCollections {
         const productsList = document.getElementById('productsList');
         productsList.innerHTML = '';
 
-        this.products.forEach(product => {
+        // Filter products based on user role
+        let productsToShow = this.products;
+        if (this.currentUser && this.currentUser.role === 'vendor') {
+            productsToShow = this.products.filter(product => product.vendorId === this.currentUser.id);
+        }
+
+        productsToShow.forEach(product => {
             const productCard = `
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
