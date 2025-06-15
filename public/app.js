@@ -181,6 +181,8 @@ class SharanyaCollections {
                     const payload = JSON.parse(atob(this.token.split('.')[1]));
                     this.currentUser = payload;
                     this.updateUI();
+                    // Reload products after authentication
+                    await this.loadProducts();
                 } else {
                     this.logout();
                 }
@@ -215,6 +217,8 @@ class SharanyaCollections {
                 this.currentUser = result.user;
                 localStorage.setItem('token', this.token);
                 this.updateUI();
+                // Reload products after login
+                await this.loadProducts();
                 this.showDashboard();
                 this.showAlert('Login successful!', 'success');
             } else {
@@ -251,6 +255,8 @@ class SharanyaCollections {
                     this.currentUser = result.user;
                     localStorage.setItem('token', this.token);
                     this.updateUI();
+                    // Reload products after signup
+                    await this.loadProducts();
                     this.showDashboard();
                     this.showAlert('Account created successfully!', 'success');
                 } else {
@@ -301,7 +307,10 @@ class SharanyaCollections {
             const response = await fetch('/api/products');
             if (response.ok) {
                 this.products = await response.json();
+                console.log('Products loaded:', this.products.length);
                 this.displayProducts();
+            } else {
+                console.error('Failed to load products:', response.status);
             }
         } catch (error) {
             console.error('Error loading products:', error);
