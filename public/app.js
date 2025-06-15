@@ -581,25 +581,39 @@ class SharanyaCollections {
         return `
             <form id="addProductForm" onsubmit="app.addProduct(event)">
                 <div class="mb-3">
-                    <input type="text" class="form-control" name="name" placeholder="Product Name" required>
+                    <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" id="productName" placeholder="Product Name" required>
+                    <div class="invalid-feedback" id="productNameError"></div>
                 </div>
                 <div class="mb-3">
-                    <textarea class="form-control" name="description" placeholder="Description" rows="2" required></textarea>
+                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="description" id="productDescription" placeholder="Description" rows="2" required></textarea>
+                    <div class="invalid-feedback" id="productDescriptionError"></div>
                 </div>
                 <div class="mb-3">
-                    <input type="number" class="form-control" name="price" placeholder="Price" step="0.01" required>
+                    <label class="form-label">Price <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="price" id="productPrice" placeholder="Price" step="0.01" required>
+                    <div class="invalid-feedback" id="productPriceError"></div>
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" name="category" placeholder="Category" required>
+                    <label class="form-label">Category <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="category" id="productCategory" placeholder="Category" required>
+                    <div class="invalid-feedback" id="productCategoryError"></div>
                 </div>
                 <div class="mb-3">
-                    <input type="number" class="form-control" name="stock" placeholder="Stock Quantity" required>
+                    <label class="form-label">Stock Quantity <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="stock" id="productStock" placeholder="Stock Quantity" required>
+                    <div class="invalid-feedback" id="productStockError"></div>
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" name="countryOfOrigin" placeholder="Country of Origin" required>
+                    <label class="form-label">Country of Origin <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="countryOfOrigin" id="productCountry" placeholder="Country of Origin" required>
+                    <div class="invalid-feedback" id="productCountryError"></div>
                 </div>
                 <div class="mb-3">
-                    <input type="file" class="form-control" name="image" accept="image/*">
+                    <label class="form-label">Product Image <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control" name="image" id="productImage" accept="image/*" required>
+                    <div class="invalid-feedback" id="productImageError"></div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Add Product</button>
             </form>
@@ -647,8 +661,116 @@ class SharanyaCollections {
         `).join('');
     }
 
+    validateProductForm() {
+        let isValid = true;
+        
+        // Validate product name
+        const name = document.getElementById('productName');
+        const nameError = document.getElementById('productNameError');
+        if (!name.value.trim()) {
+            name.classList.add('is-invalid');
+            nameError.textContent = 'Product name is required';
+            isValid = false;
+        } else {
+            name.classList.remove('is-invalid');
+            nameError.textContent = '';
+        }
+        
+        // Validate description
+        const description = document.getElementById('productDescription');
+        const descError = document.getElementById('productDescriptionError');
+        if (!description.value.trim()) {
+            description.classList.add('is-invalid');
+            descError.textContent = 'Description is required';
+            isValid = false;
+        } else {
+            description.classList.remove('is-invalid');
+            descError.textContent = '';
+        }
+        
+        // Validate price
+        const price = document.getElementById('productPrice');
+        const priceError = document.getElementById('productPriceError');
+        if (!price.value || parseFloat(price.value) <= 0) {
+            price.classList.add('is-invalid');
+            priceError.textContent = 'Valid price is required';
+            isValid = false;
+        } else {
+            price.classList.remove('is-invalid');
+            priceError.textContent = '';
+        }
+        
+        // Validate category
+        const category = document.getElementById('productCategory');
+        const catError = document.getElementById('productCategoryError');
+        if (!category.value.trim()) {
+            category.classList.add('is-invalid');
+            catError.textContent = 'Category is required';
+            isValid = false;
+        } else {
+            category.classList.remove('is-invalid');
+            catError.textContent = '';
+        }
+        
+        // Validate stock
+        const stock = document.getElementById('productStock');
+        const stockError = document.getElementById('productStockError');
+        if (!stock.value || parseInt(stock.value) < 0) {
+            stock.classList.add('is-invalid');
+            stockError.textContent = 'Valid stock quantity is required';
+            isValid = false;
+        } else {
+            stock.classList.remove('is-invalid');
+            stockError.textContent = '';
+        }
+        
+        // Validate country
+        const country = document.getElementById('productCountry');
+        const countryError = document.getElementById('productCountryError');
+        if (!country.value.trim()) {
+            country.classList.add('is-invalid');
+            countryError.textContent = 'Country of origin is required';
+            isValid = false;
+        } else {
+            country.classList.remove('is-invalid');
+            countryError.textContent = '';
+        }
+        
+        // Validate image
+        const image = document.getElementById('productImage');
+        const imageError = document.getElementById('productImageError');
+        if (!image.files || image.files.length === 0) {
+            image.classList.add('is-invalid');
+            imageError.textContent = 'Product image is required';
+            isValid = false;
+        } else {
+            const file = image.files[0];
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                image.classList.add('is-invalid');
+                imageError.textContent = 'Please select a valid image file (JPEG, PNG, GIF)';
+                isValid = false;
+            } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                image.classList.add('is-invalid');
+                imageError.textContent = 'Image size must be less than 5MB';
+                isValid = false;
+            } else {
+                image.classList.remove('is-invalid');
+                imageError.textContent = '';
+            }
+        }
+        
+        return isValid;
+    }
+
     async addProduct(e) {
         e.preventDefault();
+        
+        // Validate form before submitting
+        if (!this.validateProductForm()) {
+            return;
+        }
+        
         const formData = new FormData(e.target);
 
         try {
@@ -663,6 +785,16 @@ class SharanyaCollections {
             if (response.ok) {
                 this.showAlert('Product added successfully!', 'success');
                 e.target.reset();
+                // Clear validation states
+                const fields = ['productName', 'productDescription', 'productPrice', 'productCategory', 'productStock', 'productCountry', 'productImage'];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.classList.remove('is-invalid');
+                        const errorElement = document.getElementById(fieldId + 'Error');
+                        if (errorElement) errorElement.textContent = '';
+                    }
+                });
                 await this.loadProducts(); // Reload products to show the new one
                 this.showDashboard(); // Refresh dashboard
             } else {
