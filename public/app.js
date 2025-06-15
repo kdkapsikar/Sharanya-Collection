@@ -518,7 +518,7 @@ class SharanyaCollections {
             honeycombPattern.classList.remove('d-none');
             secondaryNav.classList.remove('d-none');
             
-            document.getElementById('userName').textContent = this.currentUser.name;
+            document.getElementById('welcomeMessage').textContent = `Hello, ${this.currentUser.name}`;
         } else {
             authLinks.classList.remove('d-none');
             userInfo.classList.add('d-none');
@@ -1704,7 +1704,7 @@ class SharanyaCollections {
                 this.currentUser = { ...this.currentUser, ...result.user };
                 
                 // Update UI
-                document.getElementById('userName').textContent = this.currentUser.name;
+                document.getElementById('welcomeMessage').textContent = `Hello, ${this.currentUser.name}`;
                 
                 this.showAlert('Profile updated successfully!', 'success');
                 this.showProfile(); // Go back to profile view
