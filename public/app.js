@@ -318,26 +318,38 @@ class SharanyaCollections {
     }
 
     async checkAuth() {
+        console.log('=== AUTH CHECK ===');
+        console.log('Token exists:', !!this.token);
+        console.log('Current URL:', window.location.href);
+        
         if (this.token) {
             try {
+                console.log('Verifying token with server...');
                 // Verify token by making a request
                 const response = await fetch('/api/orders', {
                     headers: { 'Authorization': `Bearer ${this.token}` }
                 });
                 
+                console.log('Auth check response status:', response.status);
+                
                 if (response.ok) {
                     // Token is valid, decode user info
                     const payload = JSON.parse(atob(this.token.split('.')[1]));
                     this.currentUser = payload;
+                    console.log('Token valid, user:', this.currentUser);
                     this.updateUI();
                     // Reload products after authentication
                     await this.loadProducts();
                 } else {
+                    console.log('Token invalid, logging out');
                     this.logout();
                 }
             } catch (error) {
+                console.error('Auth check failed:', error);
                 this.logout();
             }
+        } else {
+            console.log('No token found');
         }
     }
 
@@ -352,6 +364,11 @@ class SharanyaCollections {
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
 
+        console.log('=== CLIENT-SIDE LOGIN DEBUG ===');
+        console.log('Attempting login for:', data.email);
+        console.log('Current URL:', window.location.href);
+        console.log('API endpoint:', '/api/auth/signin');
+
         try {
             const response = await fetch('/api/auth/signin', {
                 method: 'POST',
@@ -359,7 +376,11 @@ class SharanyaCollections {
                 body: JSON.stringify(data)
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
             const result = await response.json();
+            console.log('Response data:', result);
             
             if (response.ok) {
                 this.token = result.token;
@@ -371,10 +392,13 @@ class SharanyaCollections {
                 this.showDashboard();
                 this.showAlert('Login successful!', 'success');
             } else {
+                console.error('Login failed with error:', result.error);
                 this.showAlert(result.error, 'danger');
             }
         } catch (error) {
-            this.showAlert('Login failed. Please try again.', 'danger');
+            console.error('Login request failed:', error);
+            console.error('Error details:', error.message);
+            this.showAlert('Login failed. Server may not be running. Error: ' + error.message, 'danger');
         }
     }
 
