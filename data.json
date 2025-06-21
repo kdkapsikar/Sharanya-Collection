@@ -21,7 +21,7 @@
     },
     {
       "id": "fd258163-42cc-420c-b587-0f13acdad3b4",
-      "name": "undefined",
+      "name": "Ketan Kapsikar",
       "email": "ketan.kapsikar@gmail.com",
       "password": "$2a$12$c/tjBqZR4REHJNkBDsNxAe30WnC/qY24egXvLNr3Iv7U4cGcnalUa",
       "role": "vendor",
@@ -29,7 +29,8 @@
       "isApproved": true,
       "createdAt": "2025-06-15T05:53:11.962Z",
       "mobile": "9999999998",
-      "updatedAt": "2025-06-15T15:26:50.996Z"
+      "updatedAt": "2025-06-15T15:41:37.172Z",
+      "address": ""
     },
     {
       "id": "6d046cb4-b267-46e0-a9c2-bcd7695f3c73",
@@ -61,7 +62,10 @@
       "isApproved": true,
       "createdAt": "2025-06-15T14:36:46.102Z",
       "mobile": "9999999997",
-      "updatedAt": "2025-06-15T15:30:50.958Z"
+      "updatedAt": "2025-06-15T16:36:13.161Z",
+      "address": "Chhatrapati Sambhajinagar, Chhatrapati Sambhajinagar District, Maharashtra, 431002, India",
+      "latitude": 19.8461111,
+      "longitude": 75.3350668
     }
   ],
   "products": [
@@ -96,6 +100,58 @@
       "createdAt": "2025-06-15T07:25:17.139Z"
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "id": "760f729a-fd86-4530-b5b8-cc45f3d3e09b",
+      "customerId": "bf6eda94-4572-41fb-b025-95fae571bae0",
+      "items": [
+        {
+          "productId": "9f42e2f0-60d0-455c-9524-52e04eb5e26f",
+          "quantity": 1,
+          "product": {
+            "id": "9f42e2f0-60d0-455c-9524-52e04eb5e26f",
+            "vendorId": "fd258163-42cc-420c-b587-0f13acdad3b4",
+            "name": "Necklace and earring set",
+            "description": "Necklace and earring set",
+            "price": 400,
+            "category": "Jewellery",
+            "stock": 1,
+            "countryOfOrigin": "India",
+            "image": "/uploads/1749973318558-DSCN9968.JPG",
+            "createdAt": "2025-06-15T07:10:54.382Z",
+            "images": [
+              "/uploads/1749973318558-DSCN9968.JPG",
+              "/uploads/1749973320523-DSCN9969.JPG",
+              "/uploads/1749973321201-DSCN9970.JPG"
+            ],
+            "updatedAt": "2025-06-15T07:42:01.811Z",
+            "vendorName": "Ketan Kapsikar"
+          }
+        },
+        {
+          "productId": "fc9c80ba-b3b4-4bc6-9cac-b6fb40a9e31c",
+          "quantity": 1,
+          "product": {
+            "id": "fc9c80ba-b3b4-4bc6-9cac-b6fb40a9e31c",
+            "vendorId": "6d046cb4-b267-46e0-a9c2-bcd7695f3c73",
+            "name": "Necklace and earring set",
+            "description": "Necklace and earring set",
+            "price": 400,
+            "category": "Jewellery",
+            "stock": 1,
+            "countryOfOrigin": "India",
+            "image": "/uploads/1749972314484-DSCN9999.JPG",
+            "createdAt": "2025-06-15T07:25:17.139Z",
+            "vendorName": "Vendor"
+          }
+        }
+      ],
+      "deliveryAddress": "Satara Parisar",
+      "totalAmount": 800,
+      "status": "pending",
+      "assignedDeliveryPerson": null,
+      "createdAt": "2025-06-16T12:03:35.774Z"
+    }
+  ],
   "deliveryPersonnel": []
 }
