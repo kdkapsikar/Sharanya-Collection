@@ -39,17 +39,35 @@ const DATA_FILE = 'data.json';
 function loadData() {
   try {
     if (fs.existsSync(DATA_FILE)) {
-      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      return {
-        users: data.users || [],
-        products: data.products || [],
-        orders: data.orders || [],
-        deliveryPersonnel: data.deliveryPersonnel || []
-      };
+      console.log('Loading data from', DATA_FILE);
+      const fileContent = fs.readFileSync(DATA_FILE, 'utf8');
+      console.log('File content length:', fileContent.length);
+      
+      if (fileContent.trim()) {
+        const data = JSON.parse(fileContent);
+        console.log('Data loaded successfully:');
+        console.log('- Users:', data.users ? data.users.length : 0);
+        console.log('- Products:', data.products ? data.products.length : 0);
+        console.log('- Orders:', data.orders ? data.orders.length : 0);
+        
+        return {
+          users: data.users || [],
+          products: data.products || [],
+          orders: data.orders || [],
+          deliveryPersonnel: data.deliveryPersonnel || []
+        };
+      } else {
+        console.log('Data file is empty, initializing with empty data');
+      }
+    } else {
+      console.log('Data file does not exist, initializing with empty data');
     }
   } catch (error) {
     console.error('Error loading data:', error);
+    console.error('Stack trace:', error.stack);
   }
+  
+  console.log('Returning empty data structure');
   return { users: [], products: [], orders: [], deliveryPersonnel: [] };
 }
 
@@ -57,18 +75,38 @@ function loadData() {
 function saveData() {
   try {
     const data = { users, products, orders, deliveryPersonnel };
+    console.log('Saving data:', {
+      users: data.users.length,
+      products: data.products.length,
+      orders: data.orders.length,
+      deliveryPersonnel: data.deliveryPersonnel.length
+    });
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+    console.log('Data saved successfully to', DATA_FILE);
   } catch (error) {
     console.error('Error saving data:', error);
+    console.error('Stack trace:', error.stack);
   }
 }
 
 // Load initial data
+console.log('Starting Sharanya Collections...');
+console.log('Current working directory:', process.cwd());
+console.log('Data file path:', path.resolve(DATA_FILE));
+
 const data = loadData();
 let users = data.users;
 let products = data.products;
 let orders = data.orders;
 let deliveryPersonnel = data.deliveryPersonnel;
+
+console.log('Initial data loaded:');
+console.log('- Total users:', users.length);
+console.log('- Admin users:', users.filter(u => u.role === 'admin').length);
+console.log('- Customer users:', users.filter(u => u.role === 'customer').length);
+console.log('- Vendor users:', users.filter(u => u.role === 'vendor').length);
+console.log('- Total products:', products.length);
+console.log('- Total orders:', orders.length);
 
 // In-memory storage for password reset codes (in production, use Redis or database)
 const passwordResetCodes = new Map();
@@ -174,14 +212,28 @@ app.post('/api/auth/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('Login attempt for email:', email);
-    console.log('Total users in system:', users.length);
-    console.log('All user emails:', users.map(u => u.email));
+    console.log('=== LOGIN ATTEMPT ===');
+    console.log('Email:', email);
+    console.log('Total users in memory:', users.length);
+    console.log('All user emails:', users.map(u => `${u.email} (${u.role})`));
+    console.log('Data file exists:', fs.existsSync(DATA_FILE));
+    
+    // Reload data to ensure we have the latest from file
+    const freshData = loadData();
+    if (freshData.users.length !== users.length) {
+      console.log('WARNING: Memory data differs from file data');
+      console.log('Memory users:', users.length, 'File users:', freshData.users.length);
+      users = freshData.users;
+      products = freshData.products;
+      orders = freshData.orders;
+      deliveryPersonnel = freshData.deliveryPersonnel;
+    }
 
     // Find user
     const user = users.find(u => u.email === email);
     if (!user) {
       console.log('User not found for email:', email);
+      console.log('Available emails:', users.map(u => u.email));
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
